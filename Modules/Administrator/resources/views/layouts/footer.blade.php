@@ -17,22 +17,43 @@
 
 <script>
     function formatRupiah(value, inputField, rawField) {
-        var cleanValue = value.replace(/[^,\d]/g, '').toString();
-        var split = cleanValue.split(',');
-        var sisa = split[0].length % 3;
-        var rupiah = split[0].substr(0, sisa);
-        var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        // Remove non-numeric characters, except for commas and dots
+        var cleanValue = value.replace(/[^,\d.]/g, '').toString();
 
-        if (ribuan) {
-            var separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
+        // Split the value into integer and fractional parts
+        var split = cleanValue.split('.');
+        var integerPart = split[0];
+        var fractionalPart = split[1] !== undefined ? split[1] : '';
+
+        // Handle the case where the integer part is empty
+        if (integerPart === '') {
+            integerPart = '0';
         }
 
-        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        // Add thousand separators
+        var sisa = integerPart.length % 3;
+        var rupiah = integerPart.substr(0, sisa);
+        var ribuan = integerPart.substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            var separator = sisa ? ',' : '';
+            rupiah += separator + ribuan.join(',');
+        }
+
+        // Ensure the fractional part has two digits
+        fractionalPart = fractionalPart.length > 2 ? fractionalPart.substring(0, 2) : fractionalPart;
+        if (fractionalPart.length === 1) {
+            fractionalPart += '0'; // Add trailing zero if needed
+        }
+
+        // Combine integer and fractional parts with dot as the decimal separator
+        rupiah = fractionalPart ? rupiah + '.' + fractionalPart : rupiah;
+
+        // Update the input field with the formatted value
         inputField.value = rupiah ? 'Rp ' + rupiah : '';
 
-        // Update the raw input field with the unformatted value
-        var rawValue = cleanValue.replace(/\./g, '');
+        // Update the raw input field with the unformatted value (remove commas and dots)
+        var rawValue = cleanValue.replace(/,/g, '').replace(/\./g, '');
         rawField.value = rawValue;
     }
     // only number and decimal

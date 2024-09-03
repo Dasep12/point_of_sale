@@ -44,10 +44,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
-                                <label for="customers_id">Customers * :</label>
-                                <select name="customers_id" class="custom-select form-control" id="customers_id"></select>
-                            </div>
+
 
                             <div class="form-group">
                                 <input type="checkbox" value="1" id="status_user" name="status_user" class="checkeds" checked="checked" /> <label for="status_user"> Status *</label>
@@ -204,22 +201,7 @@
         })
     })
 
-    function GetlistCustomers(query) {
-        $.ajax({
-            url: '{{ url("administrator/jsonForListCustomer") }}',
-            data: {
-                q: query
-            },
-            success: function(data) {
-                var $select = $('#customers_id');
-                $select.empty();
-                $select.append('<option value="*">Please Select Customers</option>');
-                $.each(data, function(index, option) {
-                    $select.append('<option value="' + option.id + '">' + option.name_customers + '</option>');
-                });
-            }
-        });
-    }
+
 
     function GetlistRoles(query) {
         $.ajax({
@@ -239,7 +221,6 @@
     }
 
     GetlistRoles("")
-    GetlistCustomers("")
 
 
     function doSuccess(act, msg, theme) {

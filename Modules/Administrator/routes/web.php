@@ -84,6 +84,14 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonUpdateCategory', 'CategoryController@jsonUpdate');
     Route::post('jsonDeleteCategory', 'CategoryController@jsonDelete');
 
+    //  PAJAK  ROUTES
+    Route::get('pajak', 'PajakController@index');
+    Route::get('jsonPajak', 'PajakController@jsonPajak');
+    Route::post('jsonCreatePajak', 'PajakController@jsonCreate');
+    Route::post('jsonDetailPajak', 'PajakController@jsonDetail');
+    Route::post('jsonUpdatePajak', 'PajakController@jsonUpdate');
+    Route::post('jsonDeletePajak', 'PajakController@jsonDelete');
+
 
     // LOCATION ROUTES 
     Route::get('location', 'LocationController@index');
@@ -117,10 +125,16 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     // SALES ROUTES 
     Route::get('penjualan', 'SalesController@index');
     Route::get('jsonSales', 'SalesController@jsonSales');
+    Route::get('jsonDetailSales', 'SalesController@jsonDetailSales');
     Route::get('getPrice', 'SalesController@getJsonPrice');
     Route::post('jsonSaveTransaksi', 'SalesController@jsonSaveTransaksi');
     Route::post('jsonCancelTransaksi', 'SalesController@jsonCancelTransaksi');
     Route::get('jsonDeleteSales', 'SalesController@jsonDeleteSales');
     Route::get('jsonPrintStruck', 'SalesController@jsonPrintStruck');
+    Route::get('jsonPrintInvoice', 'SalesController@jsonPrintInvoice');
     Route::get('jsonNoTransaksi', 'SalesController@jsonNoTransaksi');
+
+    // PEMBELIAN ROUTES 
+    Route::get('pembelian', 'PembelianController@index');
+    Route::get('jsonPembelian', 'PembelianController@jsonPembelian');
 });

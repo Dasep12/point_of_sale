@@ -58,7 +58,6 @@ class UsersController extends Controller
             $cust->phone = $req->phone;
             $cust->email = $req->email;
             $cust->role_id = $req->role_id;
-            $cust->customers_id = $req->customers_id;
             $cust->password = $req->password;
             $cust->status_user = $req->status_user == null ? 0 : 1;
             $cust->updated_at = date('Y-m-d H:i:s');

@@ -83,10 +83,10 @@
     var dataSales = [];
 </script>
 
-@include('administrator::sales.partials.CrudSales')
+@include('administrator::pembelian.partials.CrudPembelian')
 <script>
     $("#jqGridMain").jqGrid({
-        url: "{{ url('administrator/jsonSales') }}",
+        url: "{{ url('administrator/jsonPembelian') }}",
         datatype: "json",
         mtype: "GET",
         postData: {
@@ -157,7 +157,7 @@
             align: 'center',
             width: 70,
             formatter: function(cellvalue, options, rowObject) {
-                return `<a target="_blank" href='{{ url('administrator/jsonPrintInvoice?no_trans=${rowObject.no_transaksi}') }}' class="btn btn-sm text-white btn-option badge-primary"><i class="fa fa-file-pdf-o"></i></a>`;
+                return `<a class="btn btn-sm text-white btn-option badge-primary"><i class="fa fa-file-pdf-o"></i></a>`;
             },
         }, {
             label: 'Status',
@@ -201,8 +201,6 @@
         rowNum: 10,
         rowList: [10, 30, 50],
         pager: "#pager",
-        subGrid: true,
-        subGridRowExpanded: loadDetailMaterial,
         loadComplete: function(data) {
             $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
             if (data.records === 0) {
@@ -215,93 +213,6 @@
         },
     });
 
-    function loadDetailMaterial(subgrid_id, row_id) {
-        // Function to load subgrid data
-        var subgrid_table_id = subgrid_id + "_t";
-        $("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table>");
-        $("#" + subgrid_table_id).jqGrid({
-            url: "{{ url('administrator/jsonDetailSales') }}",
-            mtype: "GET",
-            datatype: "json",
-            postData: {
-                id: row_id,
-                "_token": "{{ csrf_token() }}",
-            },
-            page: 1,
-            colModel: [{
-                label: 'ID',
-                name: 'id',
-                key: true,
-                hidden: true,
-            }, {
-                label: 'Name Item',
-                name: 'item_name',
-                align: 'left',
-            }, {
-                label: 'Satuan',
-                name: 'unit_name',
-                align: 'center',
-                width: 60
-            }, {
-                label: 'Qty',
-                name: 'out_stock',
-                align: 'center',
-                width: 60
-            }, {
-                label: 'Harga jual',
-                name: 'harga_jual',
-                align: 'center',
-                width: 100,
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                },
-            }, {
-                label: 'Discount',
-                name: 'discount',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                },
-                width: 100
-            }, {
-                label: 'Total',
-                name: 'total',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                },
-                width: 100
-            }],
-            jsonReader: {
-                repeatitems: false,
-                root: function(obj) {
-                    return obj.rows;
-                },
-                page: function(obj) {
-                    return obj.page;
-                },
-                total: function(obj) {
-                    return obj.total;
-                },
-                records: function(obj) {
-                    return obj.records;
-                }
-            },
-            height: '100%',
-            rowNum: 20,
-            pager: "#" + subgrid_id + "_p"
-        });
-    }
-
 
     function actionBarangFormatter(cellvalue, options, rowObject) {
         var btnid = options.rowId;
@@ -313,11 +224,11 @@
         <?php } ?>
         return btn;
     }
-    var modal = document.getElementById("modalCrudSales");
+    var modal = document.getElementById("modalCrudPembelian");
     var elem = document.documentElement;
 
 
-    $('#modalCrudSales').on('shown.bs.modal', function() {
+    $('#modalCrudPembelian').on('shown.bs.modal', function() {
         $('#qty').trigger('focus');
         $("#jqGridSalesList").jqGrid('setGridWidth', $(".modal-dialog").width() * 0.98); //
     });
@@ -342,63 +253,53 @@
         datatype: "local",
         data: [],
         colModel: [{
-                name: 'id',
-                label: 'Id',
-                hidden: true,
-                key: true,
-            },
-            {
-                label: 'Kode Item',
-                name: 'kode_item',
-            },
-            {
-                label: 'Merek',
-                name: 'merek',
-            }, {
-                label: 'Satuan',
-                name: 'satuan',
-                align: 'center',
-            }, {
-                label: 'Qty',
-                name: 'qty',
-                align: 'center',
-            }, {
-                label: 'Harga',
-                name: 'harga_jual',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Discount',
-                name: 'discount',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Total',
-                name: 'total',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Aksi',
-                name: 'action',
-                align: 'center',
-                formatter: actionListMaterial
+            name: 'id',
+            label: 'Id',
+            hidden: true,
+            key: true,
+        }, {
+            label: 'Supplier',
+            name: 'merek',
+        }, {
+            label: 'Kode Item',
+            name: 'kode_item',
+        }, {
+            label: 'Merek',
+            name: 'merek',
+        }, {
+            label: 'Satuan',
+            name: 'satuan',
+            align: 'center',
+        }, {
+            label: 'Qty',
+            name: 'qty',
+            align: 'center',
+        }, {
+            label: 'Harga',
+            name: 'harga_jual',
+            align: 'center',
+            formatter: 'currency',
+            formatoptions: {
+                prefix: 'Rp ',
+                suffix: '',
+                thousandsSeparator: ','
             }
-        ],
+        }, {
+            label: 'Total',
+            name: 'total',
+            align: 'center',
+            formatter: 'currency',
+            formatoptions: {
+                prefix: 'Rp ',
+                suffix: '',
+                thousandsSeparator: ','
+            }
+        }, {
+            label: 'Aksi',
+            name: 'action',
+            align: 'center',
+            formatter: actionListMaterial
+        }],
         pager: "#pagerGridInboundSales",
         viewrecords: true,
         width: '100%',
@@ -482,7 +383,7 @@
             $("#btnPrintStruk").attr("disabled", true);
             $("#btnCancel").attr("disabled", true);
             $("#btnReset").attr("disabled", true);
-            $('#modalCrudSales').modal('show');
+            $('#modalCrudPembelian').modal('show');
             var qty = document.getElementById("qty");
             qty.focus();
             $('#sub_total_pref').val('');

@@ -187,7 +187,6 @@ class Users extends Model
                     'email'             => $req->email,
                     'phone'             => $req->phone,
                     'role_id'           => $req->role_id,
-                    'customers_id'      => $req->customers_id,
                     'phone'             => $req->phone,
                     'status_user'       => $req->status_user == null ? 0 : 1,
                     'created_at'        => date('Y-m-d H:i:s'),

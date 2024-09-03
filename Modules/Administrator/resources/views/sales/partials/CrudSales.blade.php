@@ -41,12 +41,17 @@
                         </div>
                         <div class="col-md-7 col-sm-12  form-group">
                             <div class="item form-group">
-                                <label class="col-md-2 col-sm-3" for="first-name">Qty <span class="required">*</span>
+                                <label class="col-md-2 col-sm-3" for="qty">Qty <span class="required">*</span>
                                 </label>
                                 <div class="col-md-8 col-sm-6 ">
                                     <input onkeypress="return isNumberKey(event)" autocomplete="off" type="text" required autofocus id="qty" class="form-control form-control-sm">
-                                    <small class="text-danger text-small">*setelah QTY terisi klik tombol <b>Tab</b> di Keyboard untuk lanjut scan</small>
-
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-md-2 col-sm-3" for="discount">Discount <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8 col-sm-6 ">
+                                    <input autocomplete="off" value="0" type="text" autofocus id="discount" class="form-control form-control-sm">
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -325,7 +330,7 @@
                                 merek: params.merek,
                                 qty: $("#qty").val(),
                                 harga_jual: params.harga_jual,
-                                discount: 0,
+                                discount: parseFloat($("#discount").val()),
                                 total: parseInt($("#qty").val()) * params.harga_jual
                             }
                             if (materialExists(params.material_id)) {
@@ -337,6 +342,7 @@
                             let totalSum = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
                             let totalPot = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.discount, 0);
 
+                            console.log(totalPot);
 
                             // SUB TOTAL
                             var sub_total_pref = document.getElementById('sub_total_pref');
@@ -344,14 +350,16 @@
                             formatRupiah(totalSum.toString(), sub_total_pref, sub_total);
 
                             // TOTAL POTONGAN
-                            var sub_total_pref = document.getElementById('total_potongan_pref');
-                            var sub_total = document.getElementById('total_potongan');
-                            formatRupiah(totalPot.toString(), sub_total_pref, sub_total);
+                            var total_potongan_pref = document.getElementById('total_potongan_pref');
+                            var total_potongan = document.getElementById('total_potongan');
+                            formatRupiah(totalPot.toString(), total_potongan_pref, total_potongan);
 
-                            // TOTAL BAYAR 
+                            // TOTAL BAYAR
+                            var totales = parseFloat(sub_total.value) - parseFloat(total_potongan.value);
+
                             var total_bayar_pref = document.getElementById('total_bayar_pref');
                             var total_bayar = document.getElementById('total_bayar');
-                            formatRupiah(totalSum.toString(), total_bayar_pref, total_bayar);
+                            formatRupiah(totales.toString(), total_bayar_pref, total_bayar);
 
                         } else {
                             doSuccess('create', resp.data, 'error')
@@ -362,9 +370,7 @@
                         $("#uang_bayar_pref").val("");
                         $("#kembalian").val("");
                         $("#kembalian_pref").val("");
-
-
-
+                        $("#discount").val("")
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";
@@ -391,6 +397,8 @@
 
             if (dataSales.length <= 0 || $("#uang_bayar").val() == "" || $("#sub_total").val() == "") {
                 doSuccess('create', "data transaksi masih kosong", 'warning');
+            } else if (parseFloat($("#uang_bayar").val()) < parseFloat($("#total_bayar").val())) {
+                doSuccess('create', "uang tidak cukup", 'warning');
             } else {
                 var data = {
                     '_token': "{{ csrf_token() }}",
@@ -446,7 +454,7 @@
         $("#btnPrintStruk").click(function(e) {
             e.preventDefault();
             $.ajax({
-                url: '{{ url("administrator/jsonPrintStruck") }}',
+                url: '{{ url("administrator/jsonPrintInvoice") }}',
                 type: 'GET',
                 xhrFields: {
                     responseType: 'blob' // To handle the binary data
@@ -520,7 +528,8 @@
                                         $("#btnPrintStruk").attr("disabled", true);
                                         $("#btnCancel").attr("disabled", true);
                                         $("#btnReset").attr("disabled", true);
-                                        doSuccess('create', response.txt, 'warning')
+                                        doSuccess('create', response.txt, 'warning');
+                                        ReloadBarang();
                                     }
                                 },
                                 error: function(xhr, desc, err) {
@@ -552,6 +561,7 @@
                 noTransaksi()
                 dataSales = [];
                 reloadgridItem(dataSales);
+                ReloadBarang();
                 $('#sub_total_pref').val('');
                 $('#sub_total').val('');
                 $('#total_potongan_pref').val('');

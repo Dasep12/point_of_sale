@@ -16,7 +16,7 @@ use Modules\Administrator\App\Models\Users;
 use Modules\Administrator\App\Models\Warehouse;
 
 
-class SalesController extends Controller
+class PembelianController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,12 +26,12 @@ class SalesController extends Controller
         $data = [
             'level' => LevelMember::where('status_level', 1)->get()
         ];
-        return view('administrator::sales/index', $data);
+        return view('administrator::pembelian/index', $data);
     }
 
 
 
-    public function jsonSales(Request $req)
+    public function jsonPembelian(Request $req)
     {
         $response = Sales::jsonList($req);
         return response()->json($response);

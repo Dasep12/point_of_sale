@@ -94,7 +94,7 @@
         <p>Receipt #: {{ $header->no_transaksi }}</p>
         <p>Kasir #: {{ ucwords(strtolower($user->fullname)) }}</p>
         <div class="line"></div>
-        <table border="0">
+        <table>
             <thead>
                 <tr>
                     <th>Item</th>

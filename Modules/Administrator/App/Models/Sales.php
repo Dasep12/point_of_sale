@@ -88,4 +88,57 @@ class Sales extends Model
         ];
         return $response;
     }
+
+    public static function jsonListDetail($req)
+    {
+        $page = $req->input('page');
+        $limit = $req->input('rows');
+        $sidx = $req->input('sidx', 'id');
+        $sord = $req->input('sord', 'asc');
+        $start = ($page - 1) * $limit;
+
+        // Total count of records
+        $qry = "SELECT COUNT(1) AS count FROM tbl_trn_detail_sales  WHERE header_id = '$req->id' ";
+
+        $countResult = DB::select($qry);
+        $count = $countResult[0]->count;
+
+        // Total pages calculation
+        if ($count > 0) {
+            $total_pages = ceil($count / $limit);
+        } else {
+            $total_pages = 0;
+        }
+
+        // Fetch data using DB::raw
+        $query = "SELECT * FROM tbl_trn_detail_sales  WHERE header_id = '$req->id' ";
+
+        $query .= " ORDER BY  id  DESC  LIMIT  $start , $limit ";
+        $data = DB::select($query);
+
+        // Prepare rows for jqGrid
+        $rows = [];
+        foreach ($data as $item) {
+            $rows[] = [
+                'id'              => $item->id,
+                'item_name'       => $item->item_name,
+                'unit_name'       => $item->unit_name,
+                'out_stock'       => $item->out_stock,
+                'discount'        => $item->discount,
+                'harga_jual'      => $item->harga_jual,
+                'total'           => $item->out_stock * $item->harga_jual  - $item->discount,
+                'cell' => [
+                    $item->id,
+                ] // Adjust fields as needed
+            ];
+        }
+
+        $response = [
+            'page' => $page,
+            'total' => $total_pages,
+            'records' => $count,
+            'rows' => $rows
+        ];
+        return $response;
+    }
 }

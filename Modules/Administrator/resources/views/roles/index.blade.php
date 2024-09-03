@@ -80,7 +80,6 @@
             datatype: "json",
             mtype: "GET",
             postData: {
-                id: "",
                 "_token": "{{ csrf_token() }}",
             },
             colModel: [{

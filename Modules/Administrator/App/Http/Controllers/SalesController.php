@@ -26,11 +26,15 @@ class SalesController extends Controller
         return view('administrator::sales/index', $data);
     }
 
-
-
     public function jsonSales(Request $req)
     {
         $response = Sales::jsonList($req);
+        return response()->json($response);
+    }
+
+    public function jsonDetailSales(Request $req)
+    {
+        $response = Sales::jsonListDetail($req);
         return response()->json($response);
     }
 
@@ -160,9 +164,36 @@ class SalesController extends Controller
         $pdf = PDF::loadView('administrator::sales.partials.struk', $data);
 
         // Set the paper size to a custom size for thermal printing
-        $pdf->setPaper([0, 0, 226, 600], 'portrait'); // 58mm width (226 pixels at 96 DPI)
+        $pdf->setPaper([0, 0, 226, 700], 'portrait'); // 58mm width (226 pixels at 96 DPI)
 
         return $pdf->stream('thermal-receipt.pdf'); // Show PDF in browser
+        // return $pdf->download('thermal-receipt.pdf'); // Download PDF directly
+
+    }
+
+    public function jsonPrintInvoice(Request $req)
+    {
+
+        $header = DB::table("tbl_trn_header_trans as a")
+            ->leftJoin("tbl_mst_level_member as b", 'b.id', '=', 'a.member_id')
+            ->leftJoin("tbl_mst_users as c", "c.id", '=', 'a.created_by')
+            ->where('a.no_transaksi', $req->no_trans)
+            ->select('a.*', 'b.name_level', 'c.fullname')
+            ->first();
+        $data = [
+            'store' => Warehouse::first(),
+            'user'  => Users::where('id', $header->created_by)->first(),
+            'header' => $header,
+            'detail' => DB::table("tbl_trn_detail_sales")
+                ->where('header_id', $header->id)
+                ->get()
+        ];
+
+        $pdf = PDF::loadView('administrator::sales.partials.invoice', $data);
+
+        $pdf->setPaper('A4', 'portrait'); // 58mm width (226 pixels at 96 DPI)
+
+        return $pdf->stream('INVOICE-' . $req->no_trans . '.pdf'); // Show PDF in browser
         // return $pdf->download('thermal-receipt.pdf'); // Download PDF directly
 
     }
