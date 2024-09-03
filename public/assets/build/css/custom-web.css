@@ -1,0 +1,152 @@
+﻿.toggle a i {
+    font-size: 22px !important
+}
+
+
+
+    /*custom */
+    /* .modal-dialog-slideout {
+        min-height: 100%;
+        margin: 0 0 0 auto;
+        background: #fff;
+    }
+
+    .modal.fade .modal-dialog.modal-dialog-slideout {
+        -webkit-transform: translate(100%,0)scale(1);
+        transform: translate(100%,0)scale(1);
+    }
+
+    .modal.fade.show .modal-dialog.modal-dialog-slideout {
+        -webkit-transform: translate(0,0);
+        transform: translate(0,0);
+        display: flex;
+        align-items: stretch;
+        -webkit-box-align: stretch;
+        height: 100%;
+    }
+
+        .modal.fade.show .modal-dialog.modal-dialog-slideout .modal-body {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+    .modal-dialog-slideout .modal-content {
+        border: 0;
+    }
+
+    .modal-dialog-slideout .modal-header, .modal-dialog-slideout .modal-footer {
+        height: 69px;
+        display: block;
+    }
+
+        .modal-dialog-slideout .modal-header h5 {
+            float: left;
+        } */
+
+
+
+    .field-validation-error > span {
+        color: red;
+        font-style: italic;
+        font-size: 11px;
+    }
+
+    .btn-option {
+        padding: .2rem .3rem !important;
+        font-size: .8rem !important;
+        line-height: 0 !important;
+        margin-bottom: 0px !important;
+        margin-right: 5px !important;
+    }
+
+    .ui-jqgrid .ui-jqgrid-view {
+        font-size: 11.8px
+    }
+
+    .left_col, .site_title, .sidebar-footer {
+        background: #052F43 !important;
+    }
+
+    .loading {
+        background: #052F43 !important;
+        border: #052F43 !important;
+    }
+
+    .form-control::placeholder {
+        font-size: 12px !important;
+    }
+
+    .x_panel {
+        /* height: 100% !important; */
+    }
+
+    .nav.side-menu > li > a:hover, .nav > li > a:focus {
+        text-decoration: none !important;
+        background: #12765f !important;
+    }
+
+    .nav.child_menu li:hover, .nav.child_menu li.active {
+        /*background-color: rgba(9, 101, 71, 0.31) !important;*/
+        background-color: #12765f !important;
+    }
+
+    .nav-md ul.nav.child_menu li::before {
+        background: #fff !important;
+    }
+
+    .btn-outline-secondary:hover {
+        color: #fff !important;
+        background-color: #171616 !important;
+        border-color: #171616 !important;
+    }
+
+    .btn-outline-secondary {
+        color: #353535 !important;
+    }
+
+    .x_panel {
+        color: #000 !important;
+    }
+
+    .modal-header {
+        color: #000 !important;
+    }
+
+    .form-group label {
+        color: #353333 !important;
+    }
+
+    .nav > li > a {
+        padding: 13px 15px 12px !important;
+        /* font-size: 12.5px !important; */
+    }
+
+    .main_menu .fa {
+        font-size: 15px !important;
+    }
+
+    .main_menu .side-down {
+        font-size: 12px !important;
+    }
+
+    .btn-filter {
+        border-radius: 0px !important;
+    }
+
+    .form-control {
+        font-size: 0.8rem !important;
+    }
+
+    .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple {
+        min-height: 34px !important;
+    }
+
+    .modal-header{
+        color: #cecaca !important;
+        background: #052F43 !important;
+    }
+    .modal-header span {
+        color: #cecaca !important;
+    }
+  
+    /**/

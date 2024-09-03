@@ -1,0 +1,283 @@
+﻿
+/* CUSTOM JQGRID STYLE */
+body.font-opensans .ui-jqgrid {
+    font-family: 'Open Sans';
+}
+
+body.font-quicksand .ui-jqgrid {
+    font-family: 'Quicksand';
+}
+
+body.font-nunito .ui-jqgrid {
+    font-family: 'Nunito';
+}
+
+body.font-raleway .ui-jqgrid {
+    font-family: 'Raleway';
+}
+
+body .ui-jqgrid {
+    font-family: var(--phoenix-font-sans-serif) !important;
+}
+
+.ui-jqgrid {
+    width: 100% !important;
+    z-index: 1 !important;
+    /*font-family: var(--phoenix-font-sans-serif) !important;*/
+}
+
+    .ui-jqgrid .ui-th-column {
+        color: var(--phoenix-body-color) !important;
+        padding-bottom: 3px !important;
+    }
+
+[data-bs-theme=theme-dark] .ui-jqgrid,
+[data-bs-theme=dark] .ui-jqgrid {
+    background: none !important;
+    background-color: var(--phoenix-card-bg) !important;
+}
+
+    [data-bs-theme=theme-dark] .ui-jqgrid tbody,
+    [data-bs-theme=dark] .ui-jqgrid tbody {
+        cursor: pointer;
+        background: none !important;
+        background-color: var(--phoenix-card-bg) !important;
+        color: var(--phoenix-body-color) !important;
+    }
+
+    [data-bs-theme=theme-dark] .ui-jqgrid .jqgrow,
+    [data-bs-theme=theme-dark] .ui-jqgrid .jqgrid-rownum,
+    [data-bs-theme=theme-dark] .ui-jqgrid .ui-jqgrid-bdiv,
+    [data-bs-theme=dark] .ui-jqgrid .jqgrow,
+    [data-bs-theme=dark] .ui-jqgrid .jqgrid-rownum,
+    [data-bs-theme=dark] .ui-jqgrid .ui-jqgrid-bdiv {
+        cursor: pointer;
+        background: none !important;
+        background-color: var(--phoenix-card-bg) !important;
+        color: var(--phoenix-body-color) !important;
+    }
+.ui-jqgrid .jqgrow:hover,
+.ui-jqgrid .jqgrow:hover[aria-selected=true] {
+    background: none !important;
+    background-color: var(--phoenix-gray-100) !important;
+    color: var(--phoenix-info) !important;
+     border-color: var(--phoenix-gray-300) !important;
+}
+[data-bs-theme=theme-dark] .ui-jqgrid .jqgrow:hover,
+[data-bs-theme=dark] .ui-jqgrid .jqgrow:hover {
+    background: none !important;
+    background-color: #464545 !important;
+    color: var(--phoenix-info) !important;
+    border-color: var(--phoenix-light-text-emphasis) !important;
+}
+
+.ui-jqgrid .jqgrow.ui-state-highlight {
+    /*background: none !important;
+    background-color: var(--phoenix-gray-100) !important;
+    color: var(--phoenix-info) !important;
+    border-color: var(--phoenix-gray-300) !important;*/
+}
+[data-bs-theme=theme-dark] .ui-jqgrid .jqgrow.ui-state-highlight,
+[data-bs-theme=dark] .ui-jqgrid .jqgrow.ui-state-highlight {
+    color: var(--phoenix-info) !important;
+    border-color: var(--phoenix-light-text-emphasis) !important;
+}
+
+
+[data-bs-theme=theme-dark] .ui-jqgrid .jqgrow[aria-selected=true],
+[data-bs-theme=dark] .ui-jqgrid .jqgrow[aria-selected=true] {
+    color: var(--phoenix-info) !important;
+}
+
+    [data-bs-theme=theme-dark] .ui-jqgrid .jqgrow[aria-selected=true] a,
+    [data-bs-theme=dark] .ui-jqgrid .jqgrow[aria-selected=true] a {
+        border-color: var(--phoenix-info) !important;
+        color: var(--phoenix-info) !important;
+    }
+
+                [data-bs-theme=theme-dark] .ui-jqgrid .jqgrow[aria-selected=true] a.btn.btn-success,
+                [data-bs-theme=dark] .ui-jqgrid .jqgrow[aria-selected=true] a.btn.btn-success {
+                    color: white !important;
+                }
+
+    [data-bs-theme=theme-dark] .ui-jqgrid .ui-th-column,
+    [data-bs-theme=theme-dark] .ui-jqgrid .ui-jqgrid-hbox,
+    [data-bs-theme=dark] .ui-jqgrid .ui-th-column,
+    [data-bs-theme=dark] .ui-jqgrid .ui-jqgrid-hbox {
+        color: var(--phoenix-body-color) !important;
+        background: none !important;
+        background-color: var(--phoenix-body-bg) !important;
+        font-weight: bold;
+    }
+
+    [data-bs-theme=theme-dark] .ui-jqgrid .ui-pg-button .ui-icon,
+    [data-bs-theme=dark] .ui-jqgrid .ui-pg-button {
+        /*text-shadow: 2px 2px 4px var(--phoenix-body-color) !important;*/
+        color: var(--phoenix-body-color) !important;
+    }
+[data-bs-theme=dark] .ui-pager-control .ui-pg-selbox {
+    background: none !important;
+    background-color: var(--phoenix-body-bg) !important;
+    color: var(--phoenix-body-color) !important;
+}
+[data-bs-theme=theme-dark] .ui-pager-control,
+[data-bs-theme=dark] .ui-pager-control {
+    border-top: 0.5px solid #808080 !important;
+    background: none !important;
+    background-color: var(--phoenix-body-bg) !important;
+    color: var(--phoenix-body-color) !important;
+}
+
+.radius-0 .ui-pager-control,
+.radius-0 .ui-jqgrid-pager,
+.radius-0 .ui-jqgrid-hdiv {
+    border-radius: 0 !important;
+}
+
+[data-bs-theme=high-contrast] .ui-jqgrid {
+    background: none !important;
+    background-color: var(--color-100) !important;
+}
+
+    [data-bs-theme=high-contrast] .ui-jqgrid tbody {
+        cursor: pointer;
+        background: none !important;
+        background-color: var(--color-100) !important;
+        color: var(--phoenix-body-color) !important;
+    }
+
+    [data-bs-theme=high-contrast] .ui-jqgrid .jqgrow,
+    [data-bs-theme=high-contrast] .ui-jqgrid .jqgrid-rownum,
+    [data-bs-theme=high-contrast] .ui-jqgrid .ui-jqgrid-bdiv {
+        cursor: pointer;
+        background: none !important;
+        background-color: var(--color-100) !important;
+        color: var(--phoenix-body-color) !important;
+    }
+
+        [data-bs-theme=high-contrast] .ui-jqgrid .jqgrow:hover {
+            background: none !important;
+            background-color: #464545 !important;
+        }
+
+        [data-bs-theme=high-contrast] .ui-jqgrid .jqgrow[aria-selected=true] {
+            color: var(--primary-rgb) !important;
+        }
+
+            [data-bs-theme=high-contrast] .ui-jqgrid .jqgrow[aria-selected=true] a {
+                border-color: var(--primary-rgb) !important;
+                color: var(--primary-rgb) !important;
+            }
+
+                [data-bs-theme=high-contrast] .ui-jqgrid .jqgrow[aria-selected=true] a.btn.btn-success {
+                    color: white !important;
+                }
+
+    [data-bs-theme=high-contrast] .ui-jqgrid .ui-th-column,
+    [data-bs-theme=high-contrast] .ui-jqgrid .ui-jqgrid-hbox {
+        color: var(--phoenix-body-color) !important;
+        background: none !important;
+        background-color: var(--color-100) !important;
+        font-weight: bold;
+    }
+
+    [data-bs-theme=high-contrast] .ui-jqgrid .ui-pg-button .ui-icon {
+        /*text-shadow: 2px 2px 4px var(--phoenix-body-color) !important;*/
+        color: var(--phoenix-body-color) !important;
+    }
+
+[data-bs-theme=high-contrast] .ui-pager-control {
+    border-top: 0.5px solid #808080 !important;
+    background: none !important;
+    background-color: #808080 !important;
+    color: var(--phoenix-body-color) !important;
+}
+
+.ui-jqgrid .icon-jqgrid {
+    padding: 0 6px 0 6px;
+    background-color: none;
+}
+
+.ui-jqgrid tbody .badge {
+    margin: 0 !important;
+    /*padding: 2px 4px 2px 4px !important;*/
+    font-size: 9px !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.19);
+}
+
+.ui-jqgrid .ui-widget-header {
+    background-color: whitesmoke;
+    background-image: none;
+    min-height: 30px
+}
+
+th.ui-th-column div {
+    white-space: normal !important;
+    height: auto !important;
+    padding: 2px;
+}
+
+
+.table-link .btn {
+    padding: 3px 5px;
+    font-size: 11px;
+    min-width: 25px;
+}
+
+.table-link .disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.ui-jqgrid {
+    padding: 1px !important;
+    margin: 1px !important;
+}
+
+.ui-jqdialog {
+    min-height: 60px;
+}
+
+.ui-jqdialog-title {
+    position: absolute;
+    padding: 0 !important;
+    margin: 0 !important;
+    top: 0 !important;
+}
+
+.ui-jqdialog-titlebar {
+    background-color: white;
+    border: none !important;
+    border-radius: unset !important;
+    border-bottom: solid 0.25px #808080 !important;
+}
+
+.ui-jqdialog a {
+    height: 20px !important;
+    padding-top: 1px !important;
+}
+
+.ui-jqdialog-titlebar-close:hover {
+    border: none !important;
+    border-radius: unset !important;
+    background: none !important;
+}
+
+.ui-jqdialog-titlebar-close::after {
+    border: none !important;
+    border-radius: unset !important;
+    background: none !important;
+}
+
+.ui-state-checkboxinvisible [type="checkbox"] {
+    display: none;
+}
+
+.modal-crud .ui-jqgrid {
+    min-height: 100%;
+    overflow: hidden;
+}
+
+.radius-0 .ui-jqgrid.ui-corner-all {
+    border-radius: 0 !important;
+}
