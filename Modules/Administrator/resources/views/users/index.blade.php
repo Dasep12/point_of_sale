@@ -223,7 +223,6 @@
         $("#username").val(username);
         $("#email").val(email);
         $("#phone").val(phone);
-        $("#password").val(password);
         $("#role_id").val(role_id).trigger('change');
         $("#customers_id").val(customers_id).trigger('change');
     }

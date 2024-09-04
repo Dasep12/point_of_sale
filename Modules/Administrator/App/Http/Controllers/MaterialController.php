@@ -3,19 +3,16 @@
 namespace Modules\Administrator\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Modules\Administrator\App\Models\Category;
-use Modules\Administrator\App\Models\Customers;
 use Modules\Administrator\App\Models\LevelMember;
 use Modules\Administrator\App\Models\Location;
 use Modules\Administrator\App\Models\Material;
 use Modules\Administrator\App\Models\Price;
 use Modules\Administrator\App\Models\Units;
 use Modules\Administrator\App\Models\Warehouse;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MaterialController extends Controller
 {
@@ -103,6 +100,120 @@ class MaterialController extends Controller
     {
         $data = Location::where(["warehouse_id" => $req->warehouse_id, 'status_location' => 1])->get();
         return response()->json($data);
+    }
+
+    public function uploadItemExcel(Request $request)
+    {
+        $request->validate([
+            'file_upload' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        $file = $request->file('file_upload');
+
+        try {
+            // Load the spreadsheet
+            $spreadsheet = IOFactory::load($file->getRealPath());
+
+            // Get the active sheet
+            $sheet = $spreadsheet->getActiveSheet();
+            $rowCount = $sheet->getHighestRow();
+            $params = [];
+            for ($i = 2; $i <= $rowCount; $i++) {
+
+                // Process the sheet data here
+                $kode_item = $sheet->getCell('B' . $i)->getValue();
+                $barcode = $sheet->getCell('C' . $i)->getValue();
+                $nama_item = $sheet->getCell('D' . $i)->getValue();
+                $jenis_item = $sheet->getCell('E' . $i)->getValue();
+                $satuan = $sheet->getCell('F' . $i)->getValue();
+                $merek = $sheet->getCell('G' . $i)->getValue();
+                $satuan_dasar = $sheet->getCell('H' . $i)->getValue();
+                $konversi_satuan = $sheet->getCell('I' . $i)->getValue();
+                $harga_pokok = $sheet->getCell('J' . $i)->getValue();
+                $stok_minimum = $sheet->getCell('K' . $i)->getValue();
+                $tipe_item = $sheet->getCell('L' . $i)->getValue();
+                $serial = $sheet->getCell('M' . $i)->getValue();
+                $rak = $sheet->getCell('N' . $i)->getValue();
+                $code_gudang = $sheet->getCell('O' . $i)->getValue();
+                $remarks = $sheet->getCell('P' . $i)->getValue();
+
+                $cekKategori = Category::where('code_categories', $jenis_item);
+                if ($cekKategori->count() <= 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Jenis Item ' . $jenis_item  . ' not found'
+                    ]);
+                }
+
+                $cekSatuan = Units::where('unit_code', $satuan);
+                if ($cekSatuan->count() <= 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Jenis Item ' . $satuan  . ' not found'
+                    ]);
+                }
+
+                $cekGudang = Warehouse::where('code_gudang', $code_gudang);
+                if ($cekGudang->count() <= 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Gudang ' . $code_gudang  . ' not found'
+                    ]);
+                }
+
+                $cekRak = Location::where('location', $rak);
+                if ($cekRak->count() <= 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Location ' . $rak  . ' not found'
+                    ]);
+                }
+
+                $data = [
+                    'kode_item'         => $kode_item,
+                    'barcode'           => $barcode,
+                    'name_item'         => $nama_item,
+                    'categori_id'       => $cekKategori->first()->id,
+                    'unit_id'           => $cekSatuan->first()->id,
+                    'merek'             => $merek,
+                    'satuan_dasar'      => $satuan_dasar,
+                    'konversi_satuan'   => $konversi_satuan,
+                    'harga_pokok'       => $harga_pokok,
+                    'stock_minimum'     => $stok_minimum,
+                    'tipe_item'         => $tipe_item,
+                    'serial'            => $serial,
+                    'location_id'       => $cekRak->first()->id,
+                    'warehouse_id'      => $cekGudang->first()->id,
+                    'remarks'           => $remarks,
+                    'status_item'       => 1,
+                    'created_at'        => date('Y-m-d H:i:s'),
+                    'created_by'        => session()->get("user_id"),
+                ];
+                array_push($params, $data);
+            }
+            DB::beginTransaction();
+            DB::table('tbl_mst_material')->insert($params);
+            try {
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'File uploaded and processed successfully',
+                    'data' => $params // Example data
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    'data' => $params // Example data
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading file: ' . $e->getMessage(),
+            ]);
+        }
     }
 
 

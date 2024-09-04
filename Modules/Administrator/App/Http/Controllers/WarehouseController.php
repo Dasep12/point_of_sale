@@ -48,6 +48,7 @@ class WarehouseController extends Controller
             $cust->Area = $req->Area;
             $cust->phone = $req->phone;
             $cust->fax = $req->fax;
+            $cust->code_gudang = $req->code_gudang;
             $cust->Address = $req->Address;
             $cust->status_warehouse = $req->status_warehouse == null ? 0 : 1;
             $cust->updated_at = date('Y-m-d H:i:s');

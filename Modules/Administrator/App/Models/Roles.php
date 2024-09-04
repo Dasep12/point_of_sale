@@ -112,7 +112,7 @@ class Roles extends Model
         $start = ($page - 1) * $limit;
 
         // Total count of records
-        $qry = "SELECT COUNT(1) AS count FROM tbl_sys_menu ";
+        $qry = "SELECT COUNT(1) AS count FROM tbl_sys_menu where StatusMenu=1 ";
 
         $countResult = DB::select($qry);
         $count = $countResult[0]->count;
@@ -131,7 +131,8 @@ class Roles extends Model
                 select tsr.enable_menu , tsr.menu_id  from tbl_sys_roleaccessmenu tsr
                 where  tsr.role_id = '$req->id'
                 group by tsr.menu_id ,tsr.enable_menu
-        )X on X.menu_id = a.Menu_id 
+        )X on X.menu_id = a.Menu_id
+        where StatusMenu=1 
         ORDER BY 
         SUBSTRING(a.MenuUrut, 4) + 0,
         CASE
@@ -141,8 +142,8 @@ class Roles extends Model
             CASE
                 WHEN a.ParentMenu = '*' THEN 0 -- Top-level menus first
                 ELSE SUBSTRING(a.MenuUrut, 4) + 0 -- Sort submenus numerically by Menu_id
-            END";
-        $query .= "  LIMIT  $start , $limit ";
+            END ";
+        $query .= " LIMIT  $start , $limit ";
         $data = DB::select($query);
 
         // Prepare rows for jqGrid

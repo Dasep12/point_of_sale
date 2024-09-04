@@ -29,6 +29,8 @@
                 <div class="form-group">
                     @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
                     <button type="button" name="tloEnable" onclick="CrudMaterial('create','*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
+
+                    <button type="button" name="tloEnable" onclick="CrudMaterial('upload','*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload</button>
                     @endif
                     <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
@@ -82,6 +84,7 @@
 </script>
 @include('administrator::material.partials.CrudMaterial')
 @include('administrator::material.partials.CrudPrice')
+@include('administrator::material.partials.UploadItem')
 <script>
     var $grid = $("#jqGridMain").jqGrid({
         url: "{{ url('administrator/jsonMaterial') }}",
@@ -303,7 +306,6 @@
             resizeGrid()
         },
         loadComplete: function(data) {
-            console.log(data)
             // $(this).jqGrid('setGridWidth', $("#jqGridMainPrice").closest(".ui-jqgrid").parent().width());
             $("#jqGridMainPrice").parent().find(".no-data").remove(); // Remove the message if there is data
             if (data.records === 0) {
@@ -328,10 +330,6 @@
             titleText: 'Tipe'
         }]
     });
-
-
-
-
 
     function actionBarangFormatter(cellvalue, options, rowObject) {
         var btnid = options.rowId;
@@ -420,6 +418,12 @@
             $(".parsley-required").html("");
             var errMsg = '<div class="col-md-12"><div class="alert alert-danger mt-2" role="alert"><span><b>Data Will Be Delete Permanently ,sure want delete ?</span></div></div>'
             $("#CrudMaterialAlertDelete").html(errMsg)
+        } else if (action == "upload") {
+            document.getElementById("formUploadItem").reset();
+            $('#modalUploadItem').modal('show');
+            $('#UploadItemError').html("");
+            $(".form-control").removeClass("parsley-error");
+            $(".parsley-required").html("");
         }
     }
 
@@ -554,7 +558,7 @@
                 // Menunggu opsi lokasi dimuat sebelum mengatur nilai yang dipilih
                 setTimeout(function() {
                     $("#location_id").val(res.location_id);
-                }, 900);
+                }, 300);
                 $("#categori_id").val(res.categori_id);
                 $("#unit_id").val(res.unit_id);
                 $("#name_item").val(res.name_item)

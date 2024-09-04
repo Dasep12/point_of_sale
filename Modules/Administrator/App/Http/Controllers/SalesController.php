@@ -13,6 +13,7 @@ use Modules\Administrator\App\Models\Users;
 use Modules\Administrator\App\Models\Warehouse;
 
 
+
 class SalesController extends Controller
 {
     /**

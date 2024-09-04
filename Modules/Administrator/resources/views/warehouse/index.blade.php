@@ -88,6 +88,10 @@
                 name: 'Area',
                 align: 'left'
             }, {
+                label: 'Kode',
+                name: 'code_gudang',
+                align: 'left'
+            }, {
                 label: 'Phone',
                 name: 'phone',
                 align: 'left'
@@ -274,6 +278,7 @@
                 $("#Address").val(res.Address)
                 $("#Area").val(res.Area)
                 $("#phone").val(res.phone)
+                $("#code_gudang").val(res.code_gudang)
                 $("#fax").val(res.fax)
                 res.status_warehouse == 1 ? $('#status_warehouse').prop('checked', true) : $('#status_warehouse').prop('checked', false);
                 $("#id").val(res.id)

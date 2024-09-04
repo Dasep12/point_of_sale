@@ -46,7 +46,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="remarks">Remarks* :</label>
-                                        <textarea type="text" required class="form-control" name="remarks" id="remarks"></textarea>
+                                        <textarea type="text" class="form-control" name="remarks" id="remarks"></textarea>
                                     </div>
 
                                 </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Modules\Administrator\App\Models\Users;
 
 class UsersController extends Controller
@@ -58,7 +59,9 @@ class UsersController extends Controller
             $cust->phone = $req->phone;
             $cust->email = $req->email;
             $cust->role_id = $req->role_id;
-            $cust->password = $req->password;
+            if ($req->password) {
+                $cust->password = Hash::make($req->password);
+            }
             $cust->status_user = $req->status_user == null ? 0 : 1;
             $cust->updated_at = date('Y-m-d H:i:s');
             $cust->updated_by = session()->get("user_id");

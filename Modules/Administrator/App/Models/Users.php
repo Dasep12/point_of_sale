@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class Users extends Model
 {
@@ -177,12 +178,11 @@ class Users extends Model
     {
         DB::beginTransaction();
         try {
-
             DB::table('tbl_mst_users')
                 ->insert([
                     'username'          => $req->username,
                     'fullname'          => $req->fullname,
-                    'password'          => $req->password,
+                    'password'          => Hash::make($req->password),
                     'lock_user'         => $req->lock_user,
                     'email'             => $req->email,
                     'phone'             => $req->phone,

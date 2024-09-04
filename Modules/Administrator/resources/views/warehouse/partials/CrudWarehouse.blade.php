@@ -37,6 +37,10 @@
                                 <label for="Area">Area * :</label>
                                 <input type="text" id="Area" class="form-control" name="Area" required />
                             </div>
+                            <div class="form-group">
+                                <label for="code_gudang">Kode Gudang * :</label>
+                                <input type="text" id="code_gudang" class="form-control" name="code_gudang" required />
+                            </div>
 
                             <div class="form-group">
                                 <label for="Address"> Address *</label>

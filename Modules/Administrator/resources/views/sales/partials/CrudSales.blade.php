@@ -370,7 +370,7 @@
                         $("#uang_bayar_pref").val("");
                         $("#kembalian").val("");
                         $("#kembalian_pref").val("");
-                        $("#discount").val("")
+                        $("#discount").val(0)
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";
@@ -394,7 +394,6 @@
 
         $("#btnBayarTrans").click(function(e) {
             e.preventDefault();
-
             if (dataSales.length <= 0 || $("#uang_bayar").val() == "" || $("#sub_total").val() == "") {
                 doSuccess('create', "data transaksi masih kosong", 'warning');
             } else if (parseFloat($("#uang_bayar").val()) < parseFloat($("#total_bayar").val())) {
@@ -418,7 +417,6 @@
                     type: 'POST',
                     data: data,
                     success: function(data) {
-                        console.log(data);
                         if (data.msg == "success") {
                             $("#btnPrintStruk").attr("disabled", false);
                             $("#btnCancel").attr("disabled", false);
@@ -428,8 +426,8 @@
                             $("#btnPrintStruk").attr("disabled", true);
                             $("#btnCancel").attr("disabled", true);
                             $("#btnReset").attr("disabled", true);
-
                         }
+
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";
@@ -438,17 +436,12 @@
                         } catch {
                             respText = xhr.responseText;
                         }
-
                         respText = unescape(respText).replaceAll("_n_", "<br/>")
-
                         var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
                         $('#CrudSalesError').html(errMsg);
                     },
                 })
             }
-
-
-
         })
 
         $("#btnPrintStruk").click(function(e) {
