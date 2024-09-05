@@ -95,13 +95,13 @@
                 align: 'center',
                 width: 90,
             }, {
-                label: 'Sales',
-                name: 'outStock',
+                label: 'Buy',
+                name: 'inStock',
                 align: 'center',
                 width: 50,
             }, {
-                label: 'Buy',
-                name: 'inStock',
+                label: 'Sales',
+                name: 'outStock',
                 align: 'center',
                 width: 50,
             }, {
@@ -115,8 +115,9 @@
                 align: 'center',
                 width: 80,
                 formatter: function(cell, row, opt) {
-                    var alert = opt.Stock < opt.stock_minimum ? 'danger' : '';
-                    var status = opt.Stock < opt.stock_minimum ? 'Stock Minuns' : 'NORMAL';
+                    console.log(opt)
+                    var alert = opt.Stock < opt.stock_minimum ? 'danger' : 'success';
+                    var status = opt.Stock < opt.stock_minimum ? 'Stock Minus' : 'Stock Safe';
                     return `<span class="badge badge-${alert}">${status}</span>`
                 }
             }, {

@@ -36,6 +36,29 @@ class PembelianController extends Controller
         $response = Beli::jsonList($req);
         return response()->json($response);
     }
+    public function jsonListDetailBeli(Request $req)
+    {
+        $response = Beli::jsonListDetailBeli($req);
+        return response()->json($response);
+    }
+
+    public function jsonDeleteBeli(Request $req)
+    {
+        DB::beginTransaction();
+        try {
+            DB::table("tbl_trn_detail_beli")->where('header_id', $req->id)->delete();
+            DB::table("tbl_trn_header_trans")->where('id', $req->id)->delete();
+            try {
+                DB::commit();
+                return response()->json(['msg' => "success"]);
+            } catch (\Illuminate\Database\QueryException $ex) {
+                DB::rollBack();
+                return response()->json(['msg' =>  $ex->getMessage()]);
+            }
+        } catch (Exception $e) {
+            return response()->json(['msg' => $e->getMessage()]);
+        }
+    }
 
     public function getJsonPriceBeli(Request $req)
     {

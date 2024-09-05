@@ -139,7 +139,9 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     // PEMBELIAN ROUTES 
     Route::get('pembelian', 'PembelianController@index');
     Route::get('jsonPembelian', 'PembelianController@jsonPembelian');
+    Route::get('jsonListDetailBeli', 'PembelianController@jsonListDetailBeli');
     Route::get('getJsonPriceBeli', 'PembelianController@getJsonPriceBeli');
+    Route::get('jsonDeleteBeli', 'PembelianController@jsonDeleteBeli');
     Route::post('jsonSaveTransaksiBeli', 'PembelianController@jsonSaveTransaksiBeli');
 
 

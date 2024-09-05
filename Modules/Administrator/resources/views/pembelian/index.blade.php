@@ -111,34 +111,12 @@
                 newformat: "d M Y H:i:s"
             },
         }, {
-            label: 'Kode Item',
-            name: 'kode_item',
-            align: 'left',
-        }, {
-            label: 'Name Item',
-            name: 'item_name',
-            align: 'left',
-        }, {
-            label: 'Merek',
-            name: 'merek',
-            align: 'left',
-        }, {
-            label: 'Qty',
-            name: 'in_stock',
+            label: 'Jumlah Item',
+            name: 'total_item',
             align: 'center',
             width: 60
         }, {
-            label: 'HPP',
-            name: 'hpp',
-            align: 'center',
-            formatter: 'currency',
-            formatoptions: {
-                prefix: 'Rp ',
-                suffix: '',
-                thousandsSeparator: ','
-            }
-        }, {
-            label: 'Total',
+            label: 'Total Bayar',
             name: 'total_bayar',
             align: 'center',
             formatter: 'currency',
@@ -189,6 +167,8 @@
         rowNum: 10,
         rowList: [10, 30, 50],
         pager: "#pager",
+        subGrid: true,
+        subGridRowExpanded: loadDetailMaterial,
         loadComplete: function(data) {
             $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
             if (data.records === 0) {
@@ -200,6 +180,93 @@
             }).trigger('resize');
         },
     });
+
+    function loadDetailMaterial(subgrid_id, row_id) {
+        // Function to load subgrid data
+        var subgrid_table_id = subgrid_id + "_t";
+        $("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table>");
+        $("#" + subgrid_table_id).jqGrid({
+            url: "{{ url('administrator/jsonListDetailBeli') }}",
+            mtype: "GET",
+            datatype: "json",
+            postData: {
+                id: row_id,
+                "_token": "{{ csrf_token() }}",
+            },
+            page: 1,
+            colModel: [{
+                label: 'ID',
+                name: 'id',
+                key: true,
+                hidden: true,
+            }, {
+                label: 'Name Item',
+                name: 'item_name',
+                align: 'left',
+            }, {
+                label: 'Satuan',
+                name: 'unit_name',
+                align: 'center',
+                width: 60
+            }, {
+                label: 'Qty',
+                name: 'in_stock',
+                align: 'center',
+                width: 60
+            }, {
+                label: 'Harga jual',
+                name: 'hpp',
+                align: 'center',
+                width: 100,
+                formatter: 'currency',
+                formatoptions: {
+                    prefix: 'Rp ',
+                    suffix: '',
+                    thousandsSeparator: ','
+                },
+            }, {
+                label: 'Discount',
+                name: 'discount',
+                align: 'center',
+                formatter: 'currency',
+                formatoptions: {
+                    prefix: 'Rp ',
+                    suffix: '',
+                    thousandsSeparator: ','
+                },
+                width: 100
+            }, {
+                label: 'Total',
+                name: 'total',
+                align: 'center',
+                formatter: 'currency',
+                formatoptions: {
+                    prefix: 'Rp ',
+                    suffix: '',
+                    thousandsSeparator: ','
+                },
+                width: 100
+            }],
+            jsonReader: {
+                repeatitems: false,
+                root: function(obj) {
+                    return obj.rows;
+                },
+                page: function(obj) {
+                    return obj.page;
+                },
+                total: function(obj) {
+                    return obj.total;
+                },
+                records: function(obj) {
+                    return obj.records;
+                }
+            },
+            height: '100%',
+            rowNum: 20,
+            pager: "#" + subgrid_id + "_p"
+        });
+    }
 
 
     function actionBarangFormatter(cellvalue, options, rowObject) {
@@ -336,7 +403,7 @@
                     btnClass: 'btn-danger',
                     action: function() {
                         $.ajax({
-                            url: '{{ url("administrator/jsonDeleteSales") }}',
+                            url: '{{ url("administrator/jsonDeleteBeli") }}',
                             type: 'GET',
                             data: {
                                 'id': id,
