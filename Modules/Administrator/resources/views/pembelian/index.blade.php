@@ -111,21 +111,25 @@
                 newformat: "d M Y H:i:s"
             },
         }, {
-            label: 'Member',
-            name: 'name_level',
+            label: 'Kode Item',
+            name: 'kode_item',
             align: 'left',
         }, {
-            label: 'Sub Total',
-            name: 'sub_total',
-            formatter: 'currency',
-            formatoptions: {
-                prefix: 'Rp ',
-                suffix: '',
-                thousandsSeparator: ','
-            }
+            label: 'Name Item',
+            name: 'item_name',
+            align: 'left',
         }, {
-            label: 'Discount',
-            name: 'total_potongan',
+            label: 'Merek',
+            name: 'merek',
+            align: 'left',
+        }, {
+            label: 'Qty',
+            name: 'in_stock',
+            align: 'center',
+            width: 60
+        }, {
+            label: 'HPP',
+            name: 'hpp',
             align: 'center',
             formatter: 'currency',
             formatoptions: {
@@ -143,22 +147,6 @@
                 suffix: '',
                 thousandsSeparator: ','
             }
-        }, {
-            label: 'Struk',
-            name: 'total_bayar',
-            align: 'center',
-            width: 50,
-            formatter: function(cellvalue, options, rowObject) {
-                return `<a target="_blank" href='{{ url('administrator/jsonPrintStruck?no_trans=${rowObject.no_transaksi}') }}' class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-file-pdf-o"></i></a>`;
-            },
-        }, {
-            label: 'Invoice',
-            name: 'total_bayar',
-            align: 'center',
-            width: 70,
-            formatter: function(cellvalue, options, rowObject) {
-                return `<a class="btn btn-sm text-white btn-option badge-primary"><i class="fa fa-file-pdf-o"></i></a>`;
-            },
         }, {
             label: 'Status',
             name: 'status_bayar',
@@ -259,7 +247,10 @@
             key: true,
         }, {
             label: 'Supplier',
-            name: 'merek',
+            name: 'supplier',
+        }, {
+            label: 'Item',
+            name: 'item_name',
         }, {
             label: 'Kode Item',
             name: 'kode_item',
@@ -275,8 +266,8 @@
             name: 'qty',
             align: 'center',
         }, {
-            label: 'Harga',
-            name: 'harga_jual',
+            label: 'HPP',
+            name: 'hpp',
             align: 'center',
             formatter: 'currency',
             formatoptions: {
@@ -380,22 +371,12 @@
             dataSales = [];
             reloadgridItem(dataSales);
             noTransaksi();
-            $("#btnPrintStruk").attr("disabled", true);
-            $("#btnCancel").attr("disabled", true);
-            $("#btnReset").attr("disabled", true);
             $('#modalCrudPembelian').modal('show');
             var qty = document.getElementById("qty");
             qty.focus();
-            $('#sub_total_pref').val('');
-            $('#sub_total').val('');
-            $('#total_potongan_pref').val('');
-            $('#total_potongan').val('');
-            $('#total_bayar_pref').val('');
-            $('#total_bayar').val('');
-            $('#uang_bayar_pref').val('');
-            $('#uang_bayar').val('');
-            $('#kembalian_pref').val('');
-            $('#kembalian').val('');
+            $('#qty').val('');
+            $('#hpp').val('');
+            $('#barcode').val('');
             openFullscreen(); // Trigger fullscreen mode
         }
 

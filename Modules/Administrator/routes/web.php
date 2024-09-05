@@ -68,6 +68,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonCreatePrice', 'MaterialController@jsonCreatePrice');
     Route::post('jsonUpdatePrice', 'MaterialController@jsonUpdatePrice');
     Route::post('jsonDeletePrice', 'MaterialController@jsonDeletePrice');
+    Route::post('uploadHargaExcel', 'MaterialController@uploadHargaExcel');
 
     //  WAREHOUSE  ROUTES
     Route::get('warehouse', 'WarehouseController@index');
@@ -138,4 +139,11 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     // PEMBELIAN ROUTES 
     Route::get('pembelian', 'PembelianController@index');
     Route::get('jsonPembelian', 'PembelianController@jsonPembelian');
+    Route::get('getJsonPriceBeli', 'PembelianController@getJsonPriceBeli');
+    Route::post('jsonSaveTransaksiBeli', 'PembelianController@jsonSaveTransaksiBeli');
+
+
+    // STOCK ROUTES 
+    Route::get('stock', 'StockController@index');
+    Route::get('jsonStock', 'StockController@jsonStock');
 });

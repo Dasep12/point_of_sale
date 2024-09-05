@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\Database\factories\MaterialFactory;
 
-class Sales extends Model
+class Beli extends Model
 {
     use HasFactory;
     /**
@@ -33,9 +33,10 @@ class Sales extends Model
         $start = ($page - 1) * $limit;
 
         // Total count of records
-        $qry = "SELECT COUNT(1) AS count FROM tbl_trn_header_trans a  left join tbl_mst_level_member b on b.id = a.member_id WHERE type in ('out') and types in ('sales') ";
+        $qry = "SELECT COUNT(1) AS count from tbl_trn_detail_beli a
+        left join tbl_trn_header_trans b on b.id = a.header_id  ";
         if ($req->search) {
-            $qry .= " and no_transaksi LIKE '%$req->search%' ";
+            $qry .= " WHERE no_transaksi LIKE '%$req->search%' ";
         }
         $countResult = DB::select($qry);
         $count = $countResult[0]->count;
@@ -48,9 +49,10 @@ class Sales extends Model
         }
 
         // Fetch data using DB::raw
-        $query = "SELECT a.* , b.name_level FROM tbl_trn_header_trans a  left join tbl_mst_level_member b on b.id = a.member_id WHERE type in ('out') and types in ('sales')";
+        $query = "SELECT a.*  , b.date_trans , b.no_transaksi  ,b.total_bayar , b.status_bayar  from tbl_trn_detail_beli a
+        left join tbl_trn_header_trans b on b.id = a.header_id ";
         if ($req->search) {
-            $query .= " AND no_transaksi LIKE '%$req->search%' ";
+            $query .= " WHERE no_transaksi LIKE '%$req->search%' ";
         }
         $query .= " ORDER BY  id  DESC  LIMIT  $start , $limit ";
         $data = DB::select($query);
@@ -61,15 +63,14 @@ class Sales extends Model
             $rows[] = [
                 'id'                => $item->id,
                 'date_trans'        => $item->date_trans,
-                'name_level'        => $item->name_level,
-                'status_bayar'      => $item->status_bayar,
+                'hpp'               => $item->hpp,
+                'item_name'         => $item->item_name,
+                'merek'             => $item->merek,
+                'kode_item'         => $item->kode_item,
+                'in_stock'          => $item->in_stock,
                 'no_transaksi'      => $item->no_transaksi,
                 'status_bayar'      => $item->status_bayar,
-                'uang_bayar'        => $item->uang_bayar,
                 'total_bayar'       => $item->total_bayar,
-                'sub_total'         => $item->sub_total,
-                'total_potongan'    => $item->total_potongan,
-                'kembalian'         => $item->kembalian,
                 'created_at'        => $item->created_at,
                 'created_by'        => $item->created_by,
                 'updated_at'        => $item->updated_at,

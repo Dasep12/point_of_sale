@@ -325,15 +325,15 @@
 
     // Function to open fullscreen mode
     function openFullscreen() {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-            /* Safari */
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            /* IE11 */
-            elem.msRequestFullscreen();
-        }
+        // if (elem.requestFullscreen) {
+        //     elem.requestFullscreen();
+        // } else if (elem.webkitRequestFullscreen) {
+        //     /* Safari */
+        //     elem.webkitRequestFullscreen();
+        // } else if (elem.msRequestFullscreen) {
+        //     /* IE11 */
+        //     elem.msRequestFullscreen();
+        // }
     }
 
 
@@ -346,6 +346,9 @@
                 label: 'Id',
                 hidden: true,
                 key: true,
+            }, {
+                label: 'Name Item',
+                name: 'item_name',
             },
             {
                 label: 'Kode Item',

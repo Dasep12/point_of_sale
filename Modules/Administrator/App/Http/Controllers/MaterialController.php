@@ -251,4 +251,78 @@ class MaterialController extends Controller
         $resp  = Material::jsonDeletePrice($req);
         return response()->json(['msg' => $resp]);
     }
+
+    public function uploadHargaExcel(Request $request)
+    {
+        $request->validate([
+            'file_upload' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        $file = $request->file('file_upload');
+
+        try {
+            // Load the spreadsheet
+            $spreadsheet = IOFactory::load($file->getRealPath());
+
+            // Get the active sheet
+            $sheet = $spreadsheet->getActiveSheet();
+            $rowCount = $sheet->getHighestRow();
+            $params = [];
+            for ($i = 2; $i <= $rowCount; $i++) {
+
+                // Process the sheet data here
+                $member = $sheet->getCell('A' . $i)->getValue();
+                $kode_item = $sheet->getCell('B' . $i)->getValue();
+                $name_item = $sheet->getCell('C' . $i)->getValue();
+                $harga = $sheet->getCell('D' . $i)->getValue();
+
+                $cekMember = LevelMember::where('name_level', $member);
+                if ($cekMember->count() <= 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Member ' . $member  . ' not found'
+                    ]);
+                }
+
+                $cekMaterial = Material::where(['kode_item' => $kode_item, 'name_item' => $name_item]);
+                if ($cekMaterial->count() <= 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Item ' . $name_item  . ' not found'
+                    ]);
+                }
+
+                $data = [
+                    'member_id'         => $cekMember->first()->id,
+                    'material_id'       => $cekMaterial->first()->id,
+                    'harga_jual'        => $harga,
+                    'created_at'        => date('Y-m-d H:i:s'),
+                    'created_by'        => session()->get("user_id"),
+                ];
+                array_push($params, $data);
+            }
+            DB::beginTransaction();
+            DB::table('tbl_mst_harga')->insert($params);
+            try {
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'File uploaded and processed successfully',
+                    'data' => $params // Example data
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    'data' => $params // Example data
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading file: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

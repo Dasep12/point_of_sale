@@ -12,6 +12,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="">File</label>
+                        <input type="text" hidden name="actionUpload" id="actionUpload">
                         <input type="file" required class="form-control" name="file_upload" id="file_upload">
                     </div>
                 </div>
@@ -51,8 +52,13 @@
 
             if (f.parsley().isValid()) {
                 var formData = new FormData($('#formUploadItem')[0]);
-                var actions = $("#UploadItemAction").val();
-                var url = '{{ url("administrator/uploadItemExcel") }}';
+                var actions = $("#actionUpload").val();
+                var url = '';
+                if (actions == "uploaditem") {
+                    url = '{{ url("administrator/uploadItemExcel") }}';
+                } else {
+                    url = '{{ url("administrator/uploadHargaExcel") }}';
+                }
                 $.ajax({
                     url: url,
                     type: 'POST',

@@ -45,10 +45,10 @@
                                 </div>
                             </div>
                             <div class="item form-group">
-                                <label class="col-md-2 col-sm-3" for="first-name">HPP / Qty <span class="required">*</span>
+                                <label class="col-md-2 col-sm-3" for="hpp">HPP / Qty <span class="required">*</span>
                                 </label>
                                 <div class="col-md-8 col-sm-6 ">
-                                    <input type="text" autocomplete="off" name="barcode" placeholder="" required class="form-control form-control-sm" id="barcode" />
+                                    <input type="text" autocomplete="off" name="hpp" placeholder="" required class="form-control form-control-sm" id="hpp" />
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -78,33 +78,13 @@
                         <div id="pagerGridInboundSales"></div>
                     </div>
 
-                    <div class="col-md-9">
-                        <div class="col-md-12 mt-3">
-
-
-                            <div class="col-md-12 mt-3">
-                                <button id="btnBayarTrans" type="button" class="btn btn-sm btn-success"><i class="fa fa-save"></i> Save</button>
-                                <button id="btnCancel" type="button" class="btn btn-sm btn-secondary"><i class="fa fa-close"></i> Batalkan</button>
-
-
-                            </div>
-                        </div>
+                    <div class="col-md-12 mt-4 ">
+                        <input type="text" hidden id="total_bayar" name="total_bayar">
+                        <input type="text" hidden id="total_bayar_pref" name="total_bayar_pref">
+                        <button id="btnBayarTrans" type="button" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> Submit</button>
+                        <button id="btnCancel" type="button" class="btn btn-sm btn-danger"><i class="fa fa-close"></i> Batal</button>
                     </div>
-
-                    <!-- <div class="col-md-3">
-                        <div class="col-md-12 mt-1">
-                            <div class="alert alert-primary">
-                                <h5>Shortcut</h5>
-                                <span><b>[ Q ]</b> : Field Qty</span><br>
-                                <span><b>[ S ]</b> : Field Barcode</span><br>
-                                <span><b>[ U ]</b> : Field Uang Bayar</span><br>
-                                <span><b>[ B ]</b> : Tekan Button Bayar</span><br>
-                                <span><b>[ P ]</b> : Tekan Button Print</span><br>
-                                <span><b>[ X ]</b> : Tekan Button Batalkan</span><br>
-                                <span><b>[ E ]</b> : Tekan Button Akhiri</span>
-                            </div>
-                        </div>
-                    </div> -->
+                    <!-- shortcut  -->
                 </div>
 
 
@@ -117,8 +97,17 @@
 
     <script>
         document.addEventListener('keydown', function(event) {
-            if (event.key == 'Tab') {
+            if (event.key == 'q') {
+                var qty = document.getElementById("qty");
+                qty.value = '';
+                qty.focus();
+            } else if (event.key == 'h') {
+                var hpp = document.getElementById("hpp");
+                hpp.value = '';
+                hpp.focus();
+            } else if (event.key == 'b') {
                 var bcd = document.getElementById("barcode");
+                bcd.value = '';
                 bcd.focus();
             }
         });
@@ -139,42 +128,6 @@
         }
         noTransaksi()
 
-        document.getElementById('uang_bayar_pref').addEventListener('input', function(e) {
-            var value = this.value.replace(/[^,\d]/g, '').toString();
-            var split = value.split(',');
-            var sisa = split[0].length % 3;
-            var rupiah = split[0].substr(0, sisa);
-            var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-            if (ribuan) {
-                var separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
-            }
-
-            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-            this.value = rupiah ? 'Rp ' + rupiah : '';
-            // Update the raw input field with the unformatted value
-            var rawValue = value.replace(/\./g, '');
-            document.getElementById('uang_bayar').value = rawValue;
-
-            if (rawValue == "" || rawValue == null) {
-                $("#kembalian_pref").val('');
-                $("#kembalian").val('');
-            } else {
-                // kembali 
-                var Uangkembali = rawValue - parseInt($('#total_bayar').val());
-                // TOTAL BAYAR 
-                if (parseInt(rawValue) >= parseInt($('#total_bayar').val())) {
-                    var kembalian_pref = document.getElementById('kembalian_pref');
-                    var kembalian = document.getElementById('kembalian');
-                    formatRupiah(Uangkembali.toString(), kembalian_pref, kembalian);
-                }
-            }
-
-
-        });
-
-
         function doSuccess(act, msg, theme) {
             const myNotification = window.createNotification({
                 // options here
@@ -187,23 +140,6 @@
                 message: msg
             });
         }
-        var qtys = document.getElementById("qty");
-
-        qtys.addEventListener('keydown', function(event) {
-            if (event.key === 'Tab') {
-                $("#barcode").attr("readonly", false);
-                var bcd = document.getElementById("barcode");
-                bcd.focus();
-                // Example action: Prevent default tab behavior and perform a custom action
-                event.preventDefault();
-
-                // Example action: Switch focus to the next input
-                let activeElement = document.activeElement;
-                if (activeElement && activeElement.nextElementSibling) {
-                    activeElement.nextElementSibling.focus();
-                }
-            }
-        })
 
         $("#formGetList").parsley();
         $('#formGetList').submit(function(e) {
@@ -217,17 +153,13 @@
 
             if (f.parsley().isValid()) {
                 var qty = document.getElementById("qty");
-                $("#barcode").attr("readonly", true);
                 qty.focus();
-
-
                 $.ajax({
-                    url: '{{ url("administrator/getPrice") }}',
+                    url: '{{ url("administrator/getJsonPriceBeli") }}',
                     method: "GET",
                     type: 'GET',
                     data: {
                         'barcode': $("#barcode").val(),
-                        'member_id': $("#member_id").val()
                     },
                     success: function(data) {
                         var resp = data;
@@ -242,47 +174,25 @@
                                 kode_item: params.kode_item,
                                 merek: params.merek,
                                 qty: $("#qty").val(),
-                                harga_jual: params.harga_jual,
-                                discount: 0,
-                                total: parseInt($("#qty").val()) * params.harga_jual
+                                supplier: $("#supplier").val(),
+                                hpp: parseFloat($("#hpp").val()),
+                                total: parseFloat($("#qty").val()) * parseFloat($("#hpp").val())
                             }
+                            console.log(datas)
                             if (materialExists(params.material_id)) {
                                 doSuccess('create', 'item sudah masuk list', 'error')
                             } else {
                                 dataSales.push(datas);
                             }
+                            let totalBayar = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
+                            $("#total_bayar").val(totalBayar);
                             reloadgridItem(dataSales);
-                            let totalSum = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
-                            let totalPot = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.discount, 0);
-
-
-                            // SUB TOTAL
-                            var sub_total_pref = document.getElementById('sub_total_pref');
-                            var sub_total = document.getElementById('sub_total');
-                            formatRupiah(totalSum.toString(), sub_total_pref, sub_total);
-
-                            // TOTAL POTONGAN
-                            var sub_total_pref = document.getElementById('total_potongan_pref');
-                            var sub_total = document.getElementById('total_potongan');
-                            formatRupiah(totalPot.toString(), sub_total_pref, sub_total);
-
-                            // TOTAL BAYAR 
-                            var total_bayar_pref = document.getElementById('total_bayar_pref');
-                            var total_bayar = document.getElementById('total_bayar');
-                            formatRupiah(totalSum.toString(), total_bayar_pref, total_bayar);
-
                         } else {
                             doSuccess('create', resp.data, 'error')
                         }
                         $("#qty").val("");
+                        $("#hpp").val("");
                         $("#barcode").val("");
-                        $("#uang_bayar").val("");
-                        $("#uang_bayar_pref").val("");
-                        $("#kembalian").val("");
-                        $("#kembalian_pref").val("");
-
-
-
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";
@@ -306,40 +216,27 @@
 
         $("#btnBayarTrans").click(function(e) {
             e.preventDefault();
-
             if (dataSales.length <= 0 || $("#uang_bayar").val() == "" || $("#sub_total").val() == "") {
                 doSuccess('create', "data transaksi masih kosong", 'warning');
             } else {
                 var data = {
                     '_token': "{{ csrf_token() }}",
                     'listBelanja': JSON.stringify(dataSales),
-                    '_sub_total': $("#sub_total").val(),
-                    '_total_potongan': $("#total_potongan").val(),
                     '_total_bayar': $("#total_bayar").val(),
-                    '_uang_bayar': $("#uang_bayar").val(),
-                    '_kembalian': $("#kembalian").val(),
                     '_noTransaksi': $("#noTransaksi").val(),
-                    '_member_id': $("#member_id").val(),
                     '_dateTransaksi': $("#dateTransaksi").val(),
                 }
+
                 $.ajax({
-                    url: '{{ url("administrator/jsonSaveTransaksi") }}',
+                    url: '{{ url("administrator/jsonSaveTransaksiBeli") }}',
                     method: "POST",
                     type: 'POST',
                     data: data,
                     success: function(data) {
-                        console.log(data);
-                        if (data.msg == "success") {
-                            $("#btnPrintStruk").attr("disabled", false);
-                            $("#btnCancel").attr("disabled", false);
-                            $("#btnReset").attr("disabled", false);
-                            doSuccess('create', 'Data Save To Record', 'success')
-                        } else {
-                            $("#btnPrintStruk").attr("disabled", true);
-                            $("#btnCancel").attr("disabled", true);
-                            $("#btnReset").attr("disabled", true);
-
-                        }
+                        // console.log(data);
+                        noTransaksi();
+                        ReloadBarang();
+                        doSuccess('create', 'Data Save To Record', 'success')
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";

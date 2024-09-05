@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\LevelMember;
 use Dompdf\Dompdf;
+use Modules\Administrator\App\Models\Beli;
 use Modules\Administrator\App\Models\Sales;
 use Modules\Administrator\App\Models\Users;
 use Modules\Administrator\App\Models\Warehouse;
@@ -30,20 +31,17 @@ class PembelianController extends Controller
     }
 
 
-
     public function jsonPembelian(Request $req)
     {
-        $response = Sales::jsonList($req);
+        $response = Beli::jsonList($req);
         return response()->json($response);
     }
 
-
-    public function getJsonPrice(Request $req)
+    public function getJsonPriceBeli(Request $req)
     {
         try {
-            $sql = "SELECT * FROM vw_master_price WHERE barcode = '$req->barcode' AND member_id ='$req->member_id' ";
             $data = DB::table('vw_master_price')
-                ->where(['barcode' => $req->barcode, 'member_id' => $req->member_id])
+                ->where(['barcode' => $req->barcode])
                 ->select('*');
 
             if ($data->count() > 0) {
@@ -59,42 +57,34 @@ class PembelianController extends Controller
         }
     }
 
-
-    public function jsonSaveTransaksi(Request $req)
+    public function jsonSaveTransaksiBeli(Request $req)
     {
         $listBelanja = json_decode($req->listBelanja);
         $dataHeader = [
             'date_trans'        => $req->_dateTransaksi . date(' h:i:s'),
-            'member_id'         => $req->_member_id,
-            'type'              => 'out',
-            'types'             => 'sales',
+            'type'              => 'in',
+            'types'             => 'beli',
             'no_transaksi'      => $req->_noTransaksi,
             'status_bayar'      => 'lunas',
-            'uang_bayar'        => $req->_uang_bayar,
             'total_bayar'       => $req->_total_bayar,
-            'sub_total'         => $req->_sub_total,
-            'total_potongan'    => $req->_total_potongan,
-            'kembalian'         => $req->_kembalian,
             'created_at'        => date('Y-m-d H:i:s'),
             'created_by'        => session()->get("user_id"),
-            // 'updated_at'        => '',
-            // 'updated_by'        => '',
         ];
 
         $detailBelanja = [];
         for ($i = 0; $i < count($listBelanja); $i++) {
             $details = array(
-                'date'                  => $req->_dateTransaksi,
+                'date'                  => $req->_dateTransaksi . date(' H:i:s'),
                 'header_id'             => '',
                 'item_id'               => $listBelanja[$i]->item_id,
                 'item_name'             => $listBelanja[$i]->item_name,
                 'unit_id'               => $listBelanja[$i]->satuan_id,
                 'unit_name'             => $listBelanja[$i]->satuan,
                 'kode_item'             => $listBelanja[$i]->kode_item,
+                'total_harga'           => $listBelanja[$i]->total,
                 'merek'                 => $listBelanja[$i]->merek,
-                'harga_jual'            => $listBelanja[$i]->harga_jual,
-                'out_stock'             => $listBelanja[$i]->qty,
-                'discount'              => $listBelanja[$i]->discount,
+                'hpp'                   => $listBelanja[$i]->hpp,
+                'in_stock'              => $listBelanja[$i]->qty,
                 'created_at'            => date('Y-m-d H:i:s'),
                 'created_by'            => session()->get("user_id"),
             );
@@ -118,103 +108,30 @@ class PembelianController extends Controller
                 for ($i = 0; $i < count($detailBelanja); $i++) {
                     $detailBelanja[$i]["header_id"] = $headersId;
                 }
-                DB::table('tbl_trn_detail_sales')->insert($detailBelanja);
+                DB::table('tbl_trn_detail_beli')->insert($detailBelanja);
             } else {
-                // $dataHeader['updated_at'] = date('Y-m-d H:i:s');
-                // $dataHeader['updated_by'] = session()->get("user_id");
                 DB::table('tbl_trn_header_trans')->where('no_transaksi', $req->_noTransaksi)->update($dataHeader);
                 $headersId = $cekHeaders->first()->id;
                 for ($i = 0; $i < count($detailBelanja); $i++) {
                     $detailBelanja[$i]["header_id"] = $headersId;
                 }
-                DB::table('tbl_trn_detail_sales')->where('header_id', $headersId)->delete();
-                DB::table('tbl_trn_detail_sales')->insert($detailBelanja);
+                DB::table('tbl_trn_detail_beli')->where('header_id', $headersId)->delete();
+                DB::table('tbl_trn_detail_beli')->insert($detailBelanja);
             }
+
+
 
             try {
                 DB::commit();
-                return response()->json(['msg' => "success", "trans" => $req->_noTransaksi]);
+                return response()->json(['success' => true, "trans" => $req->_noTransaksi, 'msg' => 'success']);
             } catch (\Illuminate\Database\QueryException $ex) {
                 DB::rollBack();
-                return response()->json(['msg' => $ex->getMessage()]);
+                return response()->json(['success' => false, 'msg' => $ex->getMessage()]);
             }
             dd($req->all());
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['msg' => $e->getMessage()]);
         }
-    }
-
-    public function jsonPrintStruck(Request $req)
-    {
-
-        $header = DB::table("tbl_trn_header_trans")
-            ->where('no_transaksi', $req->no_trans)->first();
-        $data = [
-            'store' => Warehouse::first(),
-            'user'  => Users::where('id', $header->created_by)->first(),
-            'header' => $header,
-            'detail' => DB::table("tbl_trn_detail_sales")
-                ->where('header_id', $header->id)
-                ->get()
-        ];
-
-        // return view('administrator::sales.partials.struk', compact('items', 'total'));
-        $pdf = PDF::loadView('administrator::sales.partials.struk', $data);
-
-        // Set the paper size to a custom size for thermal printing
-        $pdf->setPaper([0, 0, 226, 600], 'portrait'); // 58mm width (226 pixels at 96 DPI)
-
-        return $pdf->stream('thermal-receipt.pdf'); // Show PDF in browser
-        // return $pdf->download('thermal-receipt.pdf'); // Download PDF directly
-
-    }
-
-    public function jsonCancelTransaksi(Request $req)
-    {
-
-        DB::beginTransaction();
-        try {
-            $noTrans = $req->no_transaksi;
-            $data = DB::table('tbl_trn_header_trans')
-                ->where('no_transaksi', $noTrans);
-            if ($data->count() > 0) {
-                $data->update(['status_bayar' => 'cancel']);
-                $msg = ['msg' => "success", 'txt' => 'pesanan di batalkan'];
-            } else {
-                $msg = ['msg' => "success", 'txt' => 'no transaksi tidak ditemukan'];
-            }
-            try {
-                DB::commit();
-                return response()->json($msg);
-            } catch (\Illuminate\Database\QueryException $ex) {
-                DB::rollBack();
-                return response()->json(['msg' => $ex->getMessage()]);
-            }
-        } catch (\Exception $e) {
-        }
-    }
-
-    public function jsonDeleteSales(Request $req)
-    {
-        DB::beginTransaction();
-        try {
-            DB::table("tbl_trn_detail_sales")->where('header_id', $req->id)->delete();
-            DB::table("tbl_trn_header_trans")->where('id', $req->id)->delete();
-            try {
-                DB::commit();
-                return response()->json(['msg' => "success"]);
-            } catch (\Illuminate\Database\QueryException $ex) {
-                DB::rollBack();
-                return response()->json(['msg' =>  $ex->getMessage()]);
-            }
-        } catch (Exception $e) {
-            return response()->json(['msg' => $e->getMessage()]);
-        }
-    }
-
-    public function jsonNoTransaksi(Request $req)
-    {
-        return getNoTransaksi();
     }
 }

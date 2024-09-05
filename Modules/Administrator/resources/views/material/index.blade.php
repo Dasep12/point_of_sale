@@ -30,7 +30,9 @@
                     @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
                     <button type="button" name="tloEnable" onclick="CrudMaterial('create','*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
 
-                    <button type="button" name="tloEnable" onclick="CrudMaterial('upload','*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload</button>
+                    <button type="button" name="tloEnable" onclick="CrudMaterial('upload','uploaditem')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload Item</button>
+
+                    <button type="button" name="tloEnable" onclick="CrudMaterial('upload','uploadharga')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload Price</button>
                     @endif
                     <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
@@ -424,6 +426,7 @@
             $('#UploadItemError').html("");
             $(".form-control").removeClass("parsley-error");
             $(".parsley-required").html("");
+            $("#actionUpload").val(idx)
         }
     }
 
