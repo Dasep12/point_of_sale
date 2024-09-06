@@ -157,4 +157,9 @@ class PembelianController extends Controller
             return response()->json(['msg' => $e->getMessage()]);
         }
     }
+
+    public function jsonNoTransaksiBeli(Request $req)
+    {
+        return getNoTransaksiBeli();
+    }
 }

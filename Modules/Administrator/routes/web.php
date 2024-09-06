@@ -18,12 +18,13 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
 
     // DASHBOARD ROUTES 
     Route::get('dashboard', 'DashboardController@index');
-    Route::get('countCustomers', 'DashboardController@countCustomers');
+    Route::get('countMember', 'DashboardController@countMember');
     Route::get('countMaterial', 'DashboardController@countMaterial');
-    Route::get('countInbound', 'DashboardController@countInbound');
-    Route::get('countOutbound', 'DashboardController@countOutbound');
+    Route::get('countPenjualan', 'DashboardController@countPenjualan');
+    Route::get('countPembelian', 'DashboardController@countPembelian');
     Route::get('countAdjust', 'DashboardController@countAdjust');
     Route::get('jsonGraph', 'DashboardController@jsonGraph');
+    Route::get('jsonDashboardItem', 'DashboardController@jsonDashboardItem');
 
     // UNITS ROUTES 
     Route::get('units', 'UnitsController@index');
@@ -136,6 +137,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonPrintInvoice', 'SalesController@jsonPrintInvoice');
     Route::get('jsonNoTransaksi', 'SalesController@jsonNoTransaksi');
 
+
     // PEMBELIAN ROUTES 
     Route::get('pembelian', 'PembelianController@index');
     Route::get('jsonPembelian', 'PembelianController@jsonPembelian');
@@ -143,9 +145,18 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('getJsonPriceBeli', 'PembelianController@getJsonPriceBeli');
     Route::get('jsonDeleteBeli', 'PembelianController@jsonDeleteBeli');
     Route::post('jsonSaveTransaksiBeli', 'PembelianController@jsonSaveTransaksiBeli');
-
+    Route::get('jsonNoTransaksiBeli', 'PembelianController@jsonNoTransaksiBeli');
 
     // STOCK ROUTES 
     Route::get('stock', 'StockController@index');
     Route::get('jsonStock', 'StockController@jsonStock');
+
+
+    // REPORTING
+    Route::get('reportOut', 'ReportingController@reportOut');
+    Route::get('reportIn', 'ReportingController@reportIn');
+    Route::get('jsonListItemReporting', 'ReportingController@jsonListItemReporting');
+    Route::get('jsonListItemReporting', 'ReportingController@jsonListItemReporting');
+    Route::get('exportReportSales', 'ReportingController@exportReportSales');
+    Route::get('exportReportBeli', 'ReportingController@exportReportBeli');
 });

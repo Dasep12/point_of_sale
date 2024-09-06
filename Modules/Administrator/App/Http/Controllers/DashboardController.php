@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\Customers;
 use Modules\Administrator\App\Models\Inbound;
+use Modules\Administrator\App\Models\LevelMember;
 use Modules\Administrator\App\Models\Material;
 
 class DashboardController extends Controller
@@ -22,43 +23,39 @@ class DashboardController extends Controller
         return view('administrator::dashboard/index');
     }
 
-    public function countCustomers()
+    public function countMember()
     {
         if (session()->get("customers_id") != "*") {
-            $data = Customers::where('id', session()->get("customers_id"))->count();
+            $data = LevelMember::count();
         } else {
-            $data = Customers::count();
+            $data = LevelMember::count();
         }
         return response()->json(['data' => $data]);
     }
 
     public function countMaterial()
     {
-        if (session()->get("customers_id") != "*") {
-            $data = Material::where('customers_id', session()->get("customers_id"))->count();
-        } else {
-            $data = Material::count();
-        }
+        $data = Material::count();
         return response()->json(['data' => $data]);
     }
 
-    public function countInbound()
+    public function countPembelian()
     {
-        if (session()->get("customers_id") != "*") {
-            $data = Inbound::where(['customer_id' => session()->get("customers_id"), 'types' => 'in', 'types_trans' => 'Order'])->count();
-        } else {
-            $data = Inbound::where(['types' => 'in', 'types_trans' => 'Order'])->count();
-        }
+        $data = DB::table('tbl_trn_detail_beli as a')
+            ->leftJoin('tbl_trn_header_trans as b', 'b.id', '=', 'a.header_id')
+            ->where('types', 'beli')
+            ->select(DB::raw('SUM(a.hpp * a.in_stock) as total'))
+            ->value('total');
         return response()->json(['data' => $data]);
     }
 
-    public function countOutbound()
+    public function countPenjualan()
     {
-        if (session()->get("customers_id") != "*") {
-            $data = Inbound::where(['customer_id' => session()->get("customers_id"), 'types' => 'out', 'types_trans' => 'Order'])->count();
-        } else {
-            $data = Inbound::where(['types' => 'out', 'types_trans' => 'Order'])->count();
-        }
+        $data = DB::table('tbl_trn_detail_sales as a')
+            ->leftJoin('tbl_trn_header_trans as b', 'b.id', '=', 'a.header_id')
+            ->where(['types' => 'sales'])
+            ->select(DB::raw('SUM(a.harga_jual * a.out_stock - a.discount) as total'))
+            ->value('total');
         return response()->json(['data' => $data]);
     }
 
@@ -72,11 +69,19 @@ class DashboardController extends Controller
         return response()->json(['data' => $data]);
     }
 
+    public function jsonDashboardItem(Request $request)
+    {
+        // 
+        $query = $request->get('q');
+        $results = Material::get(['id', 'name_item']);
+        return response()->json($results, 200);
+    }
+
     public function jsonGraph(Request $req)
     {
         $cust = "";
-        if ($req->customers) {
-            $cust .= " AND customer_id = $req->customers ";
+        if ($req->item_id) {
+            $cust .= " AND item_id = $req->item_id ";
         }
         $sql = "WITH RECURSIVE DateRange AS (
                 SELECT '$req->startDate' AS Date
@@ -84,26 +89,28 @@ class DashboardController extends Controller
                 SELECT Date + INTERVAL 1 DAY
                 FROM DateRange
                 WHERE Date < '$req->endDate')
-                SELECT Date , coalesce(X.res,0)total_in,coalesce(Y.res,0)total_out
+                SELECT Date , coalesce(Y.total_in,0)total_in, coalesce(X.total_out,0)total_out
                 FROM DateRange
                 left join(
-                    select count(id) res,date_format(date_trans,'%Y-%m-%d')dates 
-                    from tbl_trn_shipingmaterial 
-                    where types in ('in') and types_trans in ('Order')
-                    $cust 
-                    group by types, types_trans , date_trans
+                    select date_format(b.date_trans,'%Y-%m-%d') as dates ,
+                    sum((harga_jual * out_stock ) - discount )total_out from tbl_trn_detail_sales a
+                    left join tbl_trn_header_trans b on a.header_id = b.id 
+                    where b.types in ('sales')
+                    $cust
+                    GROUP BY b.date_trans
                 )X on X.dates = Date 
                 left join(
-                    select count(id) res,date_format(date_trans,'%Y-%m-%d')dates 
-                    from tbl_trn_shipingmaterial 
-                    where types in ('out') and types_trans in ('Order')
-                    $cust 
-                    group by types, types_trans , date_trans
-                )Y on X.dates = Date 
+                    select date_format(b.date_trans,'%Y-%m-%d') as dates ,
+                    sum(hpp * in_stock)total_in from tbl_trn_detail_beli a
+                    left join tbl_trn_header_trans b on a.header_id = b.id 
+                    where b.types in ('beli')
+                    $cust
+                    GROUP BY b.date_trans
+                )Y on Y.dates = Date  
                 order by Date ASC   ";
         $query = DB::select($sql);
         $data = [];
-        $label = ["Inbound", "Outbound"];
+        $label = ["Pembelian", "Penjualan"];
         $inboundArray = [];
         $outboundArray = [];
         foreach ($query as $q) {

@@ -114,7 +114,7 @@
 
         function noTransaksi() {
             $.ajax({
-                url: '{{ url("administrator/jsonNoTransaksi") }}',
+                url: '{{ url("administrator/jsonNoTransaksiBeli") }}',
                 method: "GET",
                 type: 'GET',
                 data: {

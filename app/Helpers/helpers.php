@@ -6,10 +6,21 @@ use Modules\Administrator\App\Models\Sales;
 function getNoTransaksi()
 {
     $data =  DB::select("SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(tts.no_transaksi, '.', -1) AS UNSIGNED)), 0) AS noUrut
-FROM tbl_trn_header_trans tts
-WHERE tts.type IN ('out'); ");
+    FROM tbl_trn_header_trans tts where types in ('sales') ");
     $increase = (int) $data[0]->noUrut + 1;
-    $str_dn_ = "TRN." . date('myd') . '.' . $increase;
+    $str_dn_ = "TRNS." . date('myd') . '.' . $increase;
+    $DN =  $str_dn_;
+    return $DN;
+
+    return null;
+}
+
+function getNoTransaksiBeli()
+{
+    $data =  DB::select("SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(tts.no_transaksi, '.', -1) AS UNSIGNED)), 0) AS noUrut
+    FROM tbl_trn_header_trans tts where types in ('beli') ");
+    $increase = (int) $data[0]->noUrut + 1;
+    $str_dn_ = "TRNB." . date('myd') . '.' . $increase;
     $DN =  $str_dn_;
     return $DN;
 

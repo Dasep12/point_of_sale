@@ -25,46 +25,87 @@
 </div>
 
 <div class="row">
-    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 ">
-        <div class="tile-stats">
-            <div class="icon"><i class="fa fa-users"></i></div>
-            <div class="count countCustomers">0</div>
-            <h3>Customers</h3>
-            <p></p>
-        </div>
-    </div>
-    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 ">
-        <div class="tile-stats">
-            <div class="icon"><i class="fa fa-cubes"></i></div>
-            <div class="count countMaterial">0</div>
-            <h3>Material</h3>
-            <p></p>
-        </div>
-    </div>
-    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 ">
-        <div class="tile-stats">
-            <div class="icon"><i class="fa fa-inbox"></i></div>
-            <div class="count countInbound">0</div>
-            <h3>Inbound</h3>
-            <p></p>
-        </div>
-    </div>
-    <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 ">
-        <div class="tile-stats">
-            <div class="icon"><i class="fa fa-dropbox"></i></div>
-            <div class="count countOutbound">0</div>
-            <h3>Outbound</h3>
-            <p></p>
-        </div>
-    </div>
-    <!-- <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 ">
+    <div class="col-lg-8">
+        <div class="">
+            <div class="animated flipInY col-lg-6 col-md-3 col-sm-6 ">
                 <div class="tile-stats">
-                    <div class="icon"><i class="fa fa-check-square-o"></i></div>
-                    <div class="count countAdjust">0</div>
-                    <h3>Adjustment</h3>
+                    <div class="icon"><i class="fa fa-users"></i></div>
+                    <div class="count countLevelMember">0</div>
+                    <h3>Level Member</h3>
                     <p></p>
                 </div>
-            </div> -->
+            </div>
+            <div class="animated flipInY col-lg-6 col-md-3 col-sm-6 ">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-cubes"></i></div>
+                    <div class="count countMaterial">0</div>
+                    <h3>Item</h3>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div class="">
+            <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 ">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-inbox"></i></div>
+                    <div class="count countPenjualan" id="countPenjualan">0</div>
+                    <h3>Penjualan</h3>
+                    <p></p>
+                </div>
+            </div>
+            <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 ">
+                <div class="tile-stats">
+                    <div class="icon"><i class="fa fa-dropbox"></i></div>
+                    <div class="count countPembelian">0</div>
+                    <h3>Pembelian</h3>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card" style="height: 225px !important;">
+            <div class="card-body">
+                <h6>Top 5 Sales</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Total Penjualan</th>
+                            <th>Total Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Item 1</td>
+                            <td>2500,000</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Item 1</td>
+                            <td>2500,000</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Item 1</td>
+                            <td>2500,000</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Item 1</td>
+                            <td>2500,000</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Item 1</td>
+                            <td>2500,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -76,8 +117,8 @@
                 <div class="d-flex bd-highlight">
                     <div class="p-2 flex-grow-1 bd-highlight">Graph Trend</div>
                     <div class="p-2 bd-highlight" style="width: 25% !important;">
-                        <select id="customer_id" style="font-size: 0.75rem !important;" class="form-control form-control-sm custom-select select2">
-                            <option value="">*Choose Customers</option>
+                        <select id="item_id" style="font-size: 0.75rem !important;" class="form-control form-control-sm custom-select select2">
+                            <option value="">*Choose Item</option>
                             <!-- Add more options as needed -->
                         </select>
                     </div>
@@ -107,12 +148,12 @@
 
 <script>
     $(document).ready(function() {
-        function countCustomers() {
+        function countLevelMember() {
             $.ajax({
-                url: "{{ url('administrator/countCustomers') }}",
+                url: "{{ url('administrator/countMember') }}",
                 method: "GET",
                 success: function(res) {
-                    $(".countCustomers").html(res.data)
+                    $(".countLevelMember").html(res.data)
                 }
             })
         }
@@ -127,58 +168,52 @@
             })
         }
 
-        function countInbound() {
+        function countPenjualan() {
             $.ajax({
-                url: "{{ url('administrator/countInbound') }}",
+                url: "{{ url('administrator/countPenjualan') }}",
                 method: "GET",
                 success: function(res) {
-                    $(".countInbound").html(res.data)
+                    var datas = res.data;
+                    if (datas != null) {
+                        $(".countPenjualan").html(formatRpDashboard(datas.toString()))
+                    } else {
+                        $(".countPenjualan").html(0)
+                    }
                 }
             })
         }
 
-        function countOutbound() {
+        function countPembelian() {
             $.ajax({
-                url: "{{ url('administrator/countOutbound') }}",
+                url: "{{ url('administrator/countPembelian') }}",
                 method: "GET",
                 success: function(res) {
-                    $(".countOutbound").html(res.data)
+                    var datas = res.data;
+                    console.log(res)
+                    if (datas != null) {
+                        $(".countPembelian").html(formatRpDashboard(datas.toString()))
+                    } else {
+                        $(".countPembelian").html(0)
+                    }
                 }
             })
         }
 
-        function countAdjust() {
+
+        // Fetch Item
+        function GetlistMaterial(query) {
             $.ajax({
-                url: "{{ url('administrator/countAdjust') }}",
-                method: "GET",
-                success: function(res) {
-                    $(".countAdjust").html(res.data)
-                }
-            })
-        }
-        // Fetch Customers
-        function GetlistCustomers(query) {
-            $.ajax({
-                url: '{{ url("administrator/jsonListUnitsByCustomers") }}',
+                url: '{{ url("administrator/jsonDashboardItem") }}',
                 data: {
                     q: query
                 },
                 success: function(data) {
-                    var $select = $('#customer_id');
+                    var $select = $('#item_id');
                     $select.empty();
-                    var sessCustomers = "{{ session()->get('customers_id') }}";
-                    if (sessCustomers == "*") {
-                        $select.append('<option value="">*Choose Customers</option>');
-                    }
+                    $select.append('<option value="">*Choose Item</option>');
                     $.each(data, function(index, option) {
-                        if (option.id == sessCustomers) {
-                            // Stop the loop when the value is the same as targetValue
-                            $select.append('<option  value="' + option.id + '">' + option.name_customers + '</option>');
-                            return false;
-                        } else {
-                            $select.append('<option  value="' + option.id + '">' + option.name_customers + '</option>');
-                        }
-
+                        // Stop the loop when the value is the same as targetValue
+                        $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
                     });
                 }
             });
@@ -186,11 +221,11 @@
 
 
 
-        GetlistCustomers("");
-        countCustomers();
+        GetlistMaterial("");
+        countLevelMember();
         countMaterial();
-        countInbound();
-        countOutbound();
+        countPenjualan();
+        countPembelian();
 
         $('#daterange').daterangepicker({
             opens: 'left', // Specifies where the picker opens (left/right/center)
@@ -208,7 +243,7 @@
             updateGraph()
         });
 
-        $("#customer_id").change(function() {
+        $("#item_id").change(function() {
             updateGraph()
         })
         // Get the start and end dates of the current month
@@ -245,7 +280,7 @@
                 shared: true
             },
             series: [{
-                name: 'Inbound',
+                name: 'Penjualan',
                 data: [],
                 color: 'green',
                 dataLabels: {
@@ -253,7 +288,7 @@
                 }
 
             }, {
-                name: 'Outbound',
+                name: 'Pembelian',
                 data: [],
                 dataLabels: {
                     enabled: false // Disable data labels
@@ -277,7 +312,7 @@
                 data: {
                     startDate: startDate,
                     endDate: endDate,
-                    customers: $("#customer_id").val()
+                    item_id: $("#item_id").val()
                 },
                 success: function(res) {
                     grap = $("#container").highcharts();

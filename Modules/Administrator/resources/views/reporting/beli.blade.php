@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
     <div class="col-md-12 col-sm-12  ">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Reporting Outbound</h2>
+                <h2>Reporting Pembelian</h2>
                 <div class="nav navbar-right panel_toolbox">
                     <div class="input-group">
                         <!-- <input type="text" id="searching" class="form-control form-control-sm" placeholder="Search Name Material..">
@@ -27,15 +27,7 @@ use Illuminate\Support\Facades\DB;
                 <div class="d-flex justify-content-center">
                     <form id="form-filter" class="p-4 bg-light" style="width:350px">
                         <div class="form-group form-group-sm">
-                            <!-- <label for="startdateFilter" class="col-form-label col-form-label-sm">Customers</label> -->
-                            <div class="input-group input-group-sm">
-                                <select id="customer_id" name="customer_id" style="font-size: 0.75rem !important;" class="form-control form-control-sm custom-select select2">
-                                    <option value="*">*All Customers</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group form-group-sm">
-                            <!-- <label for="startdateFilter" class="col-form-label col-form-label-sm">Material</label> -->
+
                             <div class="input-group input-group-sm">
                                 <select id="material_id" name="material_id" style="font-size: 0.75rem !important;" class="form-control form-control-sm custom-select select2">
                                     <option value="*">*All Material</option>
@@ -44,7 +36,6 @@ use Illuminate\Support\Facades\DB;
                         </div>
 
                         <div class="form-group form-group-sm">
-                            <!-- <label for="startdateFilter" class="col-form-label col-form-label-sm">Date</label> -->
                             <div class="input-group input-group-sm">
                                 <input id="startdateFilter" type="date" class="form-control input-daterange" placeholder="Start Date">
                                 <div class="input-group-append">
@@ -77,40 +68,10 @@ use Illuminate\Support\Facades\DB;
     $(document).ready(function() {
 
 
-
-        // Fetch Customers
-        function GetlistCustomers(query) {
-            $.ajax({
-                url: '{{ url("administrator/jsonListUnitsByCustomers") }}',
-                data: {
-                    q: query
-                },
-                success: function(data) {
-                    var $select = $('#customer_id');
-                    $select.empty();
-                    var sessCustomers = "{{ session()->get('customers_id') }}";
-                    if (sessCustomers == "*") {
-                        $select.append('<option value="*">*All Customers</option>');
-                    }
-                    $.each(data, function(index, option) {
-                        if (option.id == sessCustomers) {
-                            // Stop the loop when the value is the same as targetValue
-                            $select.append('<option  value="' + option.id + '">' + option.name_customers + '</option>');
-                            GetlistMaterial(option.id)
-                            return false;
-                        } else {
-                            $select.append('<option  value="' + option.id + '">' + option.name_customers + '</option>');
-                        }
-
-                    });
-                }
-            });
-        }
-
         // Fetch Customers
         function GetlistMaterial(cust_id) {
             $.ajax({
-                url: '{{ url("administrator/jsonListMaterialSummary") }}',
+                url: '{{ url("administrator/jsonListItemReporting") }}',
                 data: {
                     customer_id: cust_id
                 },
@@ -126,10 +87,10 @@ use Illuminate\Support\Facades\DB;
                     $.each(data, function(index, option) {
                         if (option.id == sessCustomers) {
                             // Stop the loop when the value is the same as targetValue
-                            $select.append('<option  value="' + option.id + '">' + option.name_material + '</option>');
+                            $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
                             return false;
                         } else {
-                            $select.append('<option  value="' + option.id + '">' + option.name_material + '</option>');
+                            $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
                         }
 
                     });
@@ -137,20 +98,15 @@ use Illuminate\Support\Facades\DB;
             });
         }
 
-        $("#customer_id").change(function() {
-            GetlistMaterial($("#customer_id").val())
-        })
-
-        GetlistCustomers("");
+        GetlistMaterial("");
 
         function Exports() {
             var url = "";
-            url = "{{ url('administrator/exportReportOutbound') }}"
+            url = "{{ url('administrator/exportReportBeli') }}"
             $.ajax({
                 url: url,
                 method: "GET",
                 data: {
-                    customer_id: $("#customer_id").val(),
                     material_id: $("#material_id").val(),
                     startDate: $("#startdateFilter").val(),
                     endDate: $("#enddateFilter").val(),
