@@ -71,36 +71,18 @@
                     <thead>
                         <tr>
                             <th>Item</th>
-                            <th>Total Penjualan</th>
                             <th>Total Qty</th>
+                            <th>Total Penjualan</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach($salestop as $sl)
                         <tr>
-                            <td>1</td>
-                            <td>Item 1</td>
-                            <td>2500,000</td>
+                            <td>{{ $sl->item_name }}</td>
+                            <td>{{ $sl->qty }}</td>
+                            <td>{{ number_format($sl->total_out,0) }}</td>
                         </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Item 1</td>
-                            <td>2500,000</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Item 1</td>
-                            <td>2500,000</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Item 1</td>
-                            <td>2500,000</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Item 1</td>
-                            <td>2500,000</td>
-                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

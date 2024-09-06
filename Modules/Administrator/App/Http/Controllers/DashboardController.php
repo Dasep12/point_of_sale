@@ -20,7 +20,13 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('administrator::dashboard/index');
+        $d = DB::table('vw_topsales')
+            ->select('item_name', 'qty', 'total_out')
+            ->get();
+        $data = [
+            'salestop' => $d
+        ];
+        return view('administrator::dashboard/index', $data);
     }
 
     public function countMember()
