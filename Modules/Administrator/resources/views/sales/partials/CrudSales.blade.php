@@ -11,6 +11,7 @@
             @csrf()
             <div class="modal-body">
                 <form method="post" data-parsley-validate id="formGetList">
+                    <input type="text" hidden name="CrudSalesAction" id="CrudSalesAction">
                     <div class="row">
                         <div class="col-md-5 col-sm-12  form-group">
                             <div class="item form-group">
@@ -331,7 +332,8 @@
                                 qty: $("#qty").val(),
                                 harga_jual: params.harga_jual,
                                 discount: parseFloat($("#discount").val()),
-                                total: parseInt($("#qty").val()) * params.harga_jual
+                                subtotal: (parseInt($("#qty").val()) * params.harga_jual),
+                                total: (parseInt($("#qty").val()) * params.harga_jual) - parseFloat($("#discount").val())
                             }
                             if (materialExists(params.material_id)) {
                                 doSuccess('create', 'item sudah masuk list', 'error')
@@ -339,27 +341,8 @@
                                 dataSales.push(datas);
                             }
                             reloadgridItem(dataSales);
-                            let totalSum = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
-                            let totalPot = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.discount, 0);
 
-                            console.log(totalPot);
-
-                            // SUB TOTAL
-                            var sub_total_pref = document.getElementById('sub_total_pref');
-                            var sub_total = document.getElementById('sub_total');
-                            formatRupiah(totalSum.toString(), sub_total_pref, sub_total);
-
-                            // TOTAL POTONGAN
-                            var total_potongan_pref = document.getElementById('total_potongan_pref');
-                            var total_potongan = document.getElementById('total_potongan');
-                            formatRupiah(totalPot.toString(), total_potongan_pref, total_potongan);
-
-                            // TOTAL BAYAR
-                            var totales = parseFloat(sub_total.value) - parseFloat(total_potongan.value);
-
-                            var total_bayar_pref = document.getElementById('total_bayar_pref');
-                            var total_bayar = document.getElementById('total_bayar');
-                            formatRupiah(totales.toString(), total_bayar_pref, total_bayar);
+                            countPrice();
 
                         } else {
                             doSuccess('create', resp.data, 'error')
@@ -551,10 +534,6 @@
 
         $("#btnReset").click(function(e) {
             if (confirm('Yakin Sudahi Pesanan ?')) {
-                noTransaksi()
-                dataSales = [];
-                reloadgridItem(dataSales);
-                ReloadBarang();
                 $('#sub_total_pref').val('');
                 $('#sub_total').val('');
                 $('#total_potongan_pref').val('');
@@ -569,6 +548,14 @@
                 $("#btnCancel").attr("disabled", true);
                 $("#btnReset").attr("disabled", true);
                 doSuccess('create', "Transaksi Selesai , Terimakasih", 'warning')
+                dataSales = [];
+                reloadgridItem(dataSales);
+                ReloadBarang();
+                if ($("#CrudSalesAction").val() == "update") {
+                    $('#modalCrudSales').modal('hide');
+                } else if ($("#CrudSalesAction").val() == "create") {
+                    noTransaksi()
+                }
             }
         })
     </script>

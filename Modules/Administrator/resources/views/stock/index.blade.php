@@ -90,11 +90,6 @@
                 align: 'center',
                 width: 60,
             }, {
-                label: 'Stock Minimum',
-                name: 'stock_minimum',
-                align: 'center',
-                width: 90,
-            }, {
                 label: 'Buy',
                 name: 'inStock',
                 align: 'center',
@@ -104,6 +99,11 @@
                 name: 'outStock',
                 align: 'center',
                 width: 50,
+            }, {
+                label: 'Stock Minimum',
+                name: 'stock_minimum',
+                align: 'center',
+                width: 90,
             }, {
                 label: 'Existing Stock',
                 name: 'Stock',
@@ -169,7 +169,7 @@
         jQuery("#jqGridMain").jqGrid('setGroupHeaders', {
             useColSpanStyle: true,
             groupHeaders: [{
-                startColumnName: 'outStock',
+                startColumnName: 'inStock',
                 numberOfColumns: 2,
                 titleText: 'Trans'
             }, {

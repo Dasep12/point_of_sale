@@ -136,7 +136,15 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonPrintStruck', 'SalesController@jsonPrintStruck');
     Route::get('jsonPrintInvoice', 'SalesController@jsonPrintInvoice');
     Route::get('jsonNoTransaksi', 'SalesController@jsonNoTransaksi');
+    Route::get('jsonDetailSalesEdit', 'SalesController@jsonDetailSalesEdit');
 
+    // ADJUST ROUTES 
+    Route::get('adjust', 'AdjustController@index');
+    Route::get('jsonAdjust', 'AdjustController@jsonAdjust');
+    Route::get('jsonNoTransaksiAdjust', 'AdjustController@jsonNoTransaksiAdjust');
+    Route::post('jsonSaveTransaksiAdjust', 'AdjustController@jsonSaveTransaksiAdjust');
+    Route::get('jsonDeleteAdjust', 'AdjustController@jsonDeleteAdjust');
+    Route::get('jsonDetailAdjust', 'AdjustController@jsonDetailAdjust');
 
     // PEMBELIAN ROUTES 
     Route::get('pembelian', 'PembelianController@index');

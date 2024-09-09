@@ -322,7 +322,7 @@
             let currentDate = moment(startDate);
 
             while (currentDate <= moment(endDate)) {
-                dates.push(currentDate.format('MMM DD'));
+                dates.push(currentDate.format('DD MMM'));
                 currentDate.add(1, 'days'); // Move to the next day
             }
             grap = $("#container").highcharts();

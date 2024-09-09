@@ -38,6 +38,14 @@ class SalesController extends Controller
         $response = Sales::jsonListDetail($req);
         return response()->json($response);
     }
+    public function jsonDetailSalesEdit(Request $req)
+    {
+        $response = DB::table('tbl_trn_detail_sales')
+            ->where('header_id', $req->id)
+            ->select('*')
+            ->get();
+        return response()->json($response);
+    }
 
 
     public function getJsonPrice(Request $req)
@@ -122,8 +130,6 @@ class SalesController extends Controller
                 }
                 DB::table('tbl_trn_detail_sales')->insert($detailBelanja);
             } else {
-                // $dataHeader['updated_at'] = date('Y-m-d H:i:s');
-                // $dataHeader['updated_by'] = session()->get("user_id");
                 DB::table('tbl_trn_header_trans')->where('no_transaksi', $req->_noTransaksi)->update($dataHeader);
                 $headersId = $cekHeaders->first()->id;
                 for ($i = 0; $i < count($detailBelanja); $i++) {

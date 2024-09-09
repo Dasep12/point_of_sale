@@ -39,7 +39,7 @@
                 <hr>
                 <div class="form-group">
                     @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
-                    <button type="button" name="tloEnable" id="openModalBtn" onclick="CrudSales('create', '*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
+                    <button type="button" name="tloEnable" id="openModalBtn" onclick="CrudAdjust('create', '*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
                     @endif
                     <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
@@ -83,10 +83,10 @@
     var dataSales = [];
 </script>
 
-@include('administrator::sales.partials.CrudSales')
+@include('administrator::adjust.partials.CrudAdjust')
 <script>
     $("#jqGridMain").jqGrid({
-        url: "{{ url('administrator/jsonSales') }}",
+        url: "{{ url('administrator/jsonAdjust') }}",
         datatype: "json",
         mtype: "GET",
         postData: {
@@ -111,69 +111,16 @@
                 newformat: "d M Y H:i:s"
             },
         }, {
-            label: 'Member',
-            name: 'name_level',
-            align: 'left',
+            label: 'Total Item',
+            name: 'total_item',
+            align: 'center',
+            width: 60
         }, {
-            label: 'Member',
-            name: 'member_id',
-            align: 'left',
+            label: 'type',
+            name: 'type',
+            align: 'center',
+            width: 60,
             hidden: true
-        }, {
-            label: 'Sub Total',
-            name: 'sub_total',
-            formatter: 'currency',
-            formatoptions: {
-                prefix: 'Rp ',
-                suffix: '',
-                thousandsSeparator: ','
-            }
-        }, {
-            label: 'Discount',
-            name: 'total_potongan',
-            align: 'center',
-            formatter: 'currency',
-            formatoptions: {
-                prefix: 'Rp ',
-                suffix: '',
-                thousandsSeparator: ','
-            }
-        }, {
-            label: 'Total',
-            name: 'total_bayar',
-            align: 'center',
-            formatter: 'currency',
-            formatoptions: {
-                prefix: 'Rp ',
-                suffix: '',
-                thousandsSeparator: ','
-            }
-        }, {
-            label: 'Struk',
-            name: 'total_bayar',
-            align: 'center',
-            width: 50,
-            formatter: function(cellvalue, options, rowObject) {
-                return `<a target="_blank" href='{{ url('administrator/jsonPrintStruck?no_trans=${rowObject.no_transaksi}') }}' class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-file-pdf-o"></i></a>`;
-            },
-        }, {
-            label: 'Invoice',
-            name: 'total_bayar',
-            align: 'center',
-            width: 70,
-            formatter: function(cellvalue, options, rowObject) {
-                return `<a target="_blank" href='{{ url('administrator/jsonPrintInvoice?no_trans=${rowObject.no_transaksi}') }}' class="btn btn-sm text-white btn-option badge-primary"><i class="fa fa-file-pdf-o"></i></a>`;
-            },
-        }, {
-            label: 'Status',
-            name: 'status_bayar',
-            align: 'center',
-            width: 50,
-            formatter: function(cellvalue, options, rowObject) {
-                var status = rowObject.status_bayar;
-                var badge = rowObject.status_bayar == "lunas" ? 'badge-success' : 'badge-danger';
-                return `<span class="badge ${badge}">${status}</span>`;
-            },
         }, {
             label: 'Action',
             name: 'id',
@@ -225,7 +172,7 @@
         var subgrid_table_id = subgrid_id + "_t";
         $("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table>");
         $("#" + subgrid_table_id).jqGrid({
-            url: "{{ url('administrator/jsonDetailSales') }}",
+            url: "{{ url('administrator/jsonListDetailBeli') }}",
             mtype: "GET",
             datatype: "json",
             postData: {
@@ -249,42 +196,9 @@
                 width: 60
             }, {
                 label: 'Qty',
-                name: 'out_stock',
+                name: 'in_stock',
                 align: 'center',
                 width: 60
-            }, {
-                label: 'Harga jual',
-                name: 'harga_jual',
-                align: 'center',
-                width: 100,
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                },
-            }, {
-                label: 'Discount',
-                name: 'discount',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                },
-                width: 100
-            }, {
-                label: 'Total',
-                name: 'total',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                },
-                width: 100
             }],
             jsonReader: {
                 repeatitems: false,
@@ -313,23 +227,22 @@
         var btn = "";
         <?php
         if (CrudMenuPermission($MenuUrl, $user_id, 'edit')) { ?>
-            btn += `<button data-id="${btnid}" onclick="CrudSales('update','${btnid}')"  class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
+            btn += `<button data-id="${btnid}" onclick="CrudAdjust('update','${btnid}','')"  class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
         <?php } else { ?>
             btn += `<button disabled class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
         <?php } ?>
-
         <?php if (CrudMenuPermission($MenuUrl, $user_id, 'delete')) { ?>
-            btn += `<button  data-id="${btnid}" onclick="CrudSales('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
+            btn += `<button  data-id="${btnid}" onclick="CrudAdjust('delete','${btnid}','${rowObject.type}')" class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
         <?php } else { ?>
             btn += `<button disabled class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
         <?php } ?>
         return btn;
     }
-    var modal = document.getElementById("modalCrudSales");
+    var modal = document.getElementById("modalCrudAdjust");
     var elem = document.documentElement;
 
 
-    $('#modalCrudSales').on('shown.bs.modal', function() {
+    $('#modalCrudAdjust').on('shown.bs.modal', function() {
         $('#qty').trigger('focus');
         $("#jqGridSalesList").jqGrid('setGridWidth', $(".modal-dialog").width() * 0.98); //
     });
@@ -349,81 +262,38 @@
     }
 
 
-    // List sales
+    // List Adjust
     $("#jqGridSalesList").jqGrid({
         datatype: "local",
         data: [],
         colModel: [{
-                name: 'id',
-                label: 'Id',
-                hidden: true,
-                key: true,
-            }, {
-                label: 'Name Item',
-                name: 'item_name',
-            },
-            {
-                label: 'Kode Item',
-                name: 'kode_item',
-            },
-            {
-                label: 'Merek',
-                name: 'merek',
-            }, {
-                label: 'Satuan',
-                name: 'satuan',
-                align: 'center',
-            }, {
-                label: 'Qty',
-                name: 'qty',
-                align: 'center',
-            }, {
-                label: 'Harga',
-                name: 'harga_jual',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Sub Total',
-                name: 'subtotal',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Discount',
-                name: 'discount',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Total',
-                name: 'total',
-                align: 'center',
-                formatter: 'currency',
-                formatoptions: {
-                    prefix: 'Rp ',
-                    suffix: '',
-                    thousandsSeparator: ','
-                }
-            }, {
-                label: 'Aksi',
-                name: 'action',
-                align: 'center',
-                formatter: actionListMaterial
-            }
-        ],
+            name: 'id',
+            label: 'Id',
+            hidden: true,
+            key: true,
+        }, {
+            label: 'Item',
+            name: 'item_name',
+        }, {
+            label: 'Kode Item',
+            name: 'kode_item',
+        }, {
+            label: 'Merek',
+            name: 'merek',
+        }, {
+            label: 'Satuan',
+            name: 'satuan',
+            align: 'center',
+        }, {
+            label: 'Qty',
+            name: 'qty',
+            align: 'center',
+        }, {
+            label: 'Aksi',
+            name: 'action',
+            align: 'center',
+            formatter: actionListMaterial
+        }],
         pager: "#pagerGridInboundSales",
         viewrecords: true,
         width: '100%',
@@ -462,53 +332,42 @@
 
 
 
-    function CrudSales(act, id) {
-        $("#CrudSalesAction").val(act);
+    function CrudAdjust(act, id) {
         if (act == "create") {
             dataSales = [];
             reloadgridItem(dataSales);
             noTransaksi();
-            $("#btnPrintStruk").attr("disabled", true);
-            $("#btnCancel").attr("disabled", true);
-            $("#btnReset").attr("disabled", true);
-            $('#modalCrudSales').modal('show');
+            $("#CrudActionAdjust").val(act)
+            $('#modalCrudAdjust').modal('show');
             var qty = document.getElementById("qty");
             qty.focus();
-            $('#sub_total_pref').val('');
-            $('#sub_total').val('');
-            $('#total_potongan_pref').val('');
-            $('#total_potongan').val('');
-            $('#total_bayar_pref').val('');
-            $('#total_bayar').val('');
-            $('#uang_bayar_pref').val('');
-            $('#uang_bayar').val('');
-            $('#kembalian_pref').val('');
-            $('#kembalian').val('');
+            $('#qty').val('');
+            $('#barcode').val('');
             openFullscreen(); // Trigger fullscreen mode
-            countPrice()
         } else if (act == "update") {
-            detailList(id)
-            $("#btnPrintStruk").attr("disabled", true);
-            $("#btnCancel").attr("disabled", true);
-            $("#btnReset").attr("disabled", true);
-            $('#modalCrudSales').modal('show');
+            $('#modalCrudAdjust').modal('show');
+            $("#CrudActionAdjust").val(act)
             var qty = document.getElementById("qty");
             qty.focus();
+            $('#qty').val('');
+            $('#barcode').val('');
             var Grid = $('#jqGridMain'),
                 type = Grid.jqGrid('getCell', id, 'type'),
                 no_transaksi = Grid.jqGrid('getCell', id, 'no_transaksi'),
                 tanggal = Grid.jqGrid('getCell', id, 'date_trans'),
-                member_id = Grid.jqGrid('getCell', id, 'member_id'),
                 idMaterialField = Grid.jqGrid('getCell', id, 'id');
             const date = new Date(tanggal);
             var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
             var years = date.getFullYear();
             var dates = date.getDate() <= 9 ? '0' + (date.getDate()) : date.getDate();
             const formattedDate = `${years }-${month}-${dates}`;
+            $("#type_adjust").val(type);
             $("#noTransaksi").val(no_transaksi);
             $("#dateTransaksi").val(formattedDate);
-            $("#member_id").val(member_id)
+            detailList(idMaterialField, type)
         } else if (act == "delete") {
+            var Grid = $('#jqGridMain'),
+                type = Grid.jqGrid('getCell', id, 'type');
             $.confirm({
                 title: 'Perhatian!',
                 content: 'Hapus Transaksi ?',
@@ -517,10 +376,11 @@
                         btnClass: 'btn-danger',
                         action: function() {
                             $.ajax({
-                                url: '{{ url("administrator/jsonDeleteSales") }}',
+                                url: '{{ url("administrator/jsonDeleteAdjust") }}',
                                 type: 'GET',
                                 data: {
                                     'id': id,
+                                    'type': type,
                                     '_token': "{{ csrf_token() }}",
                                 },
                                 beforeSend: function() {
@@ -548,7 +408,6 @@
         if (act == "delete") {
             dataSales = dataSales.filter(item => item.id != id);
             reloadgridItem(dataSales);
-            countPrice();
         }
     }
 
@@ -559,78 +418,48 @@
     }
 
 
+    function detailList(idHeader, type) {
+        $.ajax({
+            url: '{{ url("administrator/jsonDetailAdjust") }}',
+            method: "GET",
+            type: 'GET',
+            data: {
+                'id': idHeader,
+                'type': type
+            },
+            success: function(res) {
+                dataSales = [];
+                var params = res[0];
+                var data = {
+                    id: params.item_id,
+                    item_id: params.item_id,
+                    item_name: params.item_name,
+                    satuan_id: params.unit_id,
+                    satuan: params.unit_name,
+                    kode_item: params.kode_item,
+                    merek: params.merek,
+                    qty: params.in_stock,
+                    hpp: 0,
+                    total: 0
+                }
+                if (materialExists(params.item_id)) {
+                    doSuccess('create', 'item sudah masuk list', 'error')
+                } else {
+                    dataSales.push(data);
+                }
+                reloadgridItem(dataSales);
+            }
+        })
+
+    }
+
+
     function removeMaterialWithId(arr, id) {
         const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
         if (objWithIdIndex > -1) {
             arr.splice(objWithIdIndex, 1);
         }
         return arr;
-    }
-
-    function countPrice() {
-        // sub total
-        let subtotalSum = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.subtotal, 0);
-
-        // sub total potongan
-        let totalPot = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.discount, 0);
-
-
-        // SUB TOTAL
-        var sub_total_pref = document.getElementById('sub_total_pref');
-        var sub_total = document.getElementById('sub_total');
-        formatRupiah(subtotalSum.toString(), sub_total_pref, sub_total);
-
-        // TOTAL POTONGAN
-        var total_potongan_pref = document.getElementById('total_potongan_pref');
-        var total_potongan = document.getElementById('total_potongan');
-        formatRupiah(totalPot.toString(), total_potongan_pref, total_potongan);
-
-        // TOTAL BAYAR
-        var totales = parseFloat(sub_total.value) - parseFloat(total_potongan.value);
-
-        var total_bayar_pref = document.getElementById('total_bayar_pref');
-        var total_bayar = document.getElementById('total_bayar');
-        formatRupiah(totales.toString(), total_bayar_pref, total_bayar);
-    }
-
-    function detailList(idHeader) {
-        $.ajax({
-            url: '{{ url("administrator/jsonDetailSalesEdit") }}',
-            method: "GET",
-            type: 'GET',
-            data: {
-                'id': idHeader,
-            },
-            success: function(res) {
-                var params = res;
-                dataSales = [];
-                for (let i = 0; i < params.length; i++) {
-                    var data = {
-                        id: params[i].item_id,
-                        item_id: params[i].item_id,
-                        item_name: params[i].item_name,
-                        satuan_id: params[i].unit_id,
-                        satuan: params[i].unit_name,
-                        kode_item: params[i].kode_item,
-                        merek: params[i].merek,
-                        qty: params[i].out_stock,
-                        harga_jual: params[i].harga_jual,
-                        subtotal: (parseFloat(params[i].harga_jual) * parseFloat(params[i].out_stock)),
-                        discount: params[i].discount,
-                        total: (parseFloat(params[i].harga_jual) * parseFloat(params[i].out_stock)) - parseFloat(params[i].discount)
-                    }
-                    if (materialExists(params.item_id)) {
-                        doSuccess('create', 'item sudah masuk list', 'error')
-                    } else {
-                        dataSales.push(data);
-                    }
-                }
-                reloadgridItem(dataSales);
-                countPrice();
-
-            }
-        })
-
     }
 </script>
 

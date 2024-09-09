@@ -27,23 +27,15 @@ function getNoTransaksiBeli()
     return null;
 }
 
-function getSuratJalanAdjust($idCustomers)
+function getNoTransaksiAdjust()
 {
-    if ($idCustomers) {
-        $data =  DB::select("SELECT max(substr(tts.no_transaksi ,12,12)) noUrut  
-        from  tbl_mst_header_trans tts Where tts.type in ('out') ");
-        $cust  = Sales::find($idCustomers);
+    $data =  DB::select("SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(tts.no_transaksi, '.', -1) AS UNSIGNED)), 0) AS noUrut
+    FROM tbl_trn_header_trans tts where types in ('adjust') ");
+    $increase = (int) $data[0]->noUrut + 1;
+    $str_dn_ = "TRNA." . date('myd') . '.' . $increase;
+    $DN =  $str_dn_;
+    return $DN;
 
-        if ($data[0]->noUrut) {
-            $increase =  $data[0]->noUrut + 1;
-            $str_dn_ = str_pad($increase, 4, 0, STR_PAD_LEFT);
-            $DN =  $str_dn_ . '/' . "ADJUST/" . 'RIM/' . $cust->code_customers . '/' . getRomawiMonth((int) date('m')) . '/' . date('Y');
-            return $DN;
-        } else {
-            $DN =  '0001/' . "ADJUST/" . 'RIM/' . $cust->code_customers . '/' . getRomawiMonth((int) date('m')) . '/' . date('Y');
-            return $DN;
-        }
-    }
     return null;
 }
 
