@@ -154,6 +154,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonDeleteBeli', 'PembelianController@jsonDeleteBeli');
     Route::post('jsonSaveTransaksiBeli', 'PembelianController@jsonSaveTransaksiBeli');
     Route::get('jsonNoTransaksiBeli', 'PembelianController@jsonNoTransaksiBeli');
+    Route::get('jsonListDetailBeliEdit', 'PembelianController@jsonListDetailBeliEdit');
 
     // STOCK ROUTES 
     Route::get('stock', 'StockController@index');

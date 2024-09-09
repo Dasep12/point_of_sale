@@ -126,6 +126,7 @@ class Beli extends Model
         foreach ($data as $item) {
             $rows[] = [
                 'id'              => $item->id,
+                'supplier'        => $item->supplier_name,
                 'item_name'       => $item->item_name,
                 'unit_name'       => $item->unit_name,
                 'in_stock'        => $item->in_stock,

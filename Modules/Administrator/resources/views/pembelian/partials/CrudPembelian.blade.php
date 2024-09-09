@@ -11,6 +11,7 @@
             @csrf()
             <div class="modal-body">
                 <form method="post" data-parsley-validate id="formGetList">
+                    <input type="text" hidden name="CrudActionBeli" id="CrudActionBeli">
                     <div class="row">
                         <div class="col-md-5 col-sm-12  form-group">
                             <div class="item form-group">
@@ -184,8 +185,9 @@
                             } else {
                                 dataSales.push(datas);
                             }
-                            let totalBayar = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
-                            $("#total_bayar").val(totalBayar);
+
+
+                            countPrice()
                             reloadgridItem(dataSales);
                         } else {
                             doSuccess('create', resp.data, 'error')
@@ -237,6 +239,10 @@
                         noTransaksi();
                         ReloadBarang();
                         doSuccess('create', 'Data Save To Record', 'success')
+
+                        if ($("#CrudActionBeli").val() == "update") {
+                            $('#modalCrudPembelian').modal('hide');
+                        }
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";

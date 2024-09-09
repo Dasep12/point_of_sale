@@ -176,16 +176,17 @@
                 <td>Penerima</td>
                 <td></td>
                 <td class="text-center"></td>
-                <td class="right-align">Total Akhir </td>
-                <td class="right-align">: {{ number_format($header->total_bayar,2) }}</td>
+                <td class="right-align">Total Potongan </td>
+                <td class="right-align">: {{ number_format($header->total_potongan,2) }} </td>
+
             </tr>
             <tr>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td class="right-align">Total Potongan </td>
-                <td class="right-align">: {{ number_format($header->total_potongan,2) }} </td>
+                <td class="right-align">Total Akhir </td>
+                <td class="right-align">: {{ number_format($header->total_bayar,2) }}</td>
             </tr>
             <tr>
                 <td></td>

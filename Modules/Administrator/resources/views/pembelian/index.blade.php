@@ -39,7 +39,7 @@
                 <hr>
                 <div class="form-group">
                     @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
-                    <button type="button" name="tloEnable" id="openModalBtn" onclick="CrudListItem('create', '*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
+                    <button type="button" name="tloEnable" id="openModalBtn" onclick="CrudBeli('create', '*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
                     @endif
                     <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
@@ -100,6 +100,10 @@
         }, {
             label: 'No Transaksi',
             name: 'no_transaksi',
+            align: 'left',
+        }, {
+            label: 'supplier',
+            name: 'supplier',
             align: 'left',
         }, {
             label: 'Tanggal',
@@ -234,7 +238,8 @@
                     suffix: '',
                     thousandsSeparator: ','
                 },
-                width: 100
+                width: 100,
+                hidden: true
             }, {
                 label: 'Total',
                 name: 'total',
@@ -272,8 +277,15 @@
     function actionBarangFormatter(cellvalue, options, rowObject) {
         var btnid = options.rowId;
         var btn = "";
+        <?php
+        if (CrudMenuPermission($MenuUrl, $user_id, 'edit')) { ?>
+            btn += `<button data-id="${btnid}" onclick="CrudBeli('update','${btnid}')"  class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
+        <?php } else { ?>
+            btn += `<button disabled class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
+        <?php } ?>
+
         <?php if (CrudMenuPermission($MenuUrl, $user_id, 'delete')) { ?>
-            btn += `<button  data-id="${btnid}" onclick="DeleteSales('${btnid}')" class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
+            btn += `<button  data-id="${btnid}" onclick="CrudBeli('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
         <?php } else { ?>
             btn += `<button disabled class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
         <?php } ?>
@@ -394,47 +406,10 @@
         $("#jqGridSalesList").trigger('reloadGrid');
     }
 
-    function DeleteSales(id) {
-        $.confirm({
-            title: 'Perhatian!',
-            content: 'Hapus Transaksi ?',
-            buttons: {
-                yes: {
-                    btnClass: 'btn-danger',
-                    action: function() {
-                        $.ajax({
-                            url: '{{ url("administrator/jsonDeleteBeli") }}',
-                            type: 'GET',
-                            data: {
-                                'id': id,
-                                '_token': "{{ csrf_token() }}",
-                            },
-                            beforeSend: function() {
-                                document.getElementById("fullPageLoader").style.display = "block";
-                            },
-                            complete: function() {
-                                document.getElementById("fullPageLoader").style.display = "none";
-                            },
-                            success: function(response) {
-                                ReloadBarang()
-                                console.log(response)
-                            }
-                        })
-                    }
-                },
-                no: {
-                    btnClass: 'btn-blue',
-                    action: function() {}
-                },
-            }
-        });
-    }
 
-    function CrudListItem(act, id) {
-        if (act == "delete") {
-            dataSales = dataSales.filter(item => item.id != id);
-            reloadgridItem(dataSales);
-        } else if (act == "create") {
+    function CrudBeli(act, id) {
+        $("#CrudActionBeli").val(act)
+        if (act == "create") {
             dataSales = [];
             reloadgridItem(dataSales);
             noTransaksi();
@@ -445,8 +420,71 @@
             $('#hpp').val('');
             $('#barcode').val('');
             openFullscreen(); // Trigger fullscreen mode
+        } else if (act == "update") {
+            dataSales = [];
+            reloadgridItem(dataSales);
+            $('#modalCrudPembelian').modal('show');
+            var qty = document.getElementById("qty");
+            qty.focus();
+            $('#qty').val('');
+            $('#hpp').val('');
+            $('#barcode').val('');
+            openFullscreen(); // Trigger fullscreen mode
+            var Grid = $('#jqGridMain'),
+                no_transaksi = Grid.jqGrid('getCell', id, 'no_transaksi'),
+                tanggal = Grid.jqGrid('getCell', id, 'date_trans'),
+                idMaterialField = Grid.jqGrid('getCell', id, 'id');
+            const date = new Date(tanggal);
+            var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+            var years = date.getFullYear();
+            var dates = date.getDate() <= 9 ? '0' + (date.getDate()) : date.getDate();
+            const formattedDate = `${years }-${month}-${dates}`;
+            $("#noTransaksi").val(no_transaksi);
+            $("#dateTransaksi").val(formattedDate);
+            detailList(id)
+        } else if (act == "delete") {
+            $.confirm({
+                title: 'Perhatian!',
+                content: 'Hapus Transaksi ?',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-danger',
+                        action: function() {
+                            $.ajax({
+                                url: '{{ url("administrator/jsonDeleteBeli") }}',
+                                type: 'GET',
+                                data: {
+                                    'id': id,
+                                    '_token': "{{ csrf_token() }}",
+                                },
+                                beforeSend: function() {
+                                    document.getElementById("fullPageLoader").style.display = "block";
+                                },
+                                complete: function() {
+                                    document.getElementById("fullPageLoader").style.display = "none";
+                                },
+                                success: function(response) {
+                                    ReloadBarang()
+                                    console.log(response)
+                                }
+                            })
+                        }
+                    },
+                    no: {
+                        btnClass: 'btn-blue',
+                        action: function() {}
+                    },
+                }
+            });
         }
+    }
 
+    function CrudListItem(act, id) {
+        if (act == "delete") {
+            dataSales = dataSales.filter(item => item.id != id);
+            reloadgridItem(dataSales);
+            countPrice()
+        }
     }
 
     function materialExists(idx) {
@@ -462,6 +500,58 @@
             arr.splice(objWithIdIndex, 1);
         }
         return arr;
+    }
+
+    function detailList(idHeader) {
+        $.ajax({
+            url: '{{ url("administrator/jsonListDetailBeliEdit") }}',
+            method: "GET",
+            type: 'GET',
+            data: {
+                'id': idHeader,
+            },
+            success: function(res) {
+                var params = res;
+                dataSales = [];
+                for (let i = 0; i < params.length; i++) {
+                    var data = {
+                        id: params[i].item_id,
+                        item_id: params[i].item_id,
+                        item_name: params[i].item_name,
+                        satuan_id: params[i].unit_id,
+                        satuan: params[i].unit_name,
+                        kode_item: params[i].kode_item,
+                        merek: params[i].merek,
+                        qty: params[i].in_stock,
+                        supplier: params[i].supplier_name,
+                        hpp: params[i].hpp,
+                        total: parseFloat(params[i].hpp) * parseFloat(params[i].in_stock)
+                    }
+                    if (materialExists(params.item_id)) {
+                        doSuccess('create', 'item sudah masuk list', 'error')
+                    } else {
+                        dataSales.push(data);
+                    }
+                }
+                reloadgridItem(dataSales);
+                countPrice()
+            }
+        })
+
+    }
+
+    function countPrice() {
+        // sub total
+        let subtotalSum = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
+
+        // TOTAL BAYAR
+        var total_bayar_pref = document.getElementById('total_bayar_pref');
+        var total_bayar = document.getElementById('total_bayar');
+        formatRupiah(subtotalSum.toString(), total_bayar_pref, total_bayar);
+
+        // let totalBayar = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
+        // $("#total_bayar").val(totalBayar);
+
     }
 </script>
 

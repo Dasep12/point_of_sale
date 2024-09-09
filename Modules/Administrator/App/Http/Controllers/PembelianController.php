@@ -42,6 +42,15 @@ class PembelianController extends Controller
         return response()->json($response);
     }
 
+    public function jsonListDetailBeliEdit(Request $req)
+    {
+        $response = DB::table('tbl_trn_detail_beli')
+            ->where('header_id', $req->id)
+            ->select('*')
+            ->get();
+        return response()->json($response);
+    }
+
     public function jsonDeleteBeli(Request $req)
     {
         DB::beginTransaction();
@@ -100,6 +109,7 @@ class PembelianController extends Controller
                 'date'                  => $req->_dateTransaksi . date(' H:i:s'),
                 'header_id'             => '',
                 'item_id'               => $listBelanja[$i]->item_id,
+                'supplier_name'         => $listBelanja[$i]->supplier,
                 'item_name'             => $listBelanja[$i]->item_name,
                 'unit_id'               => $listBelanja[$i]->satuan_id,
                 'unit_name'             => $listBelanja[$i]->satuan,
@@ -141,9 +151,6 @@ class PembelianController extends Controller
                 DB::table('tbl_trn_detail_beli')->where('header_id', $headersId)->delete();
                 DB::table('tbl_trn_detail_beli')->insert($detailBelanja);
             }
-
-
-
             try {
                 DB::commit();
                 return response()->json(['success' => true, "trans" => $req->_noTransaksi, 'msg' => 'success']);
@@ -151,7 +158,6 @@ class PembelianController extends Controller
                 DB::rollBack();
                 return response()->json(['success' => false, 'msg' => $ex->getMessage()]);
             }
-            dd($req->all());
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['msg' => $e->getMessage()]);
