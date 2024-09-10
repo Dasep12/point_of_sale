@@ -14,6 +14,7 @@
                         <label for="">File</label>
                         <input type="text" hidden name="actionUpload" id="actionUpload">
                         <input type="file" required class="form-control" name="file_upload" id="file_upload">
+                        <a href="" id="format_upload">download format</a>
                     </div>
                 </div>
 

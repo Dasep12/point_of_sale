@@ -193,6 +193,14 @@
                 <td></td>
                 <td></td>
                 <td></td>
+                <td class="right-align">{{ $pajak->name }} ({{ $pajak->persentase . '%' }})</td>
+                <td class="right-align">: {{ number_format($header->total_bayar * $pajak->persentase / 100  ,2) }} </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td class="right-align">Tunai </td>
                 <td class="right-align">: {{ number_format($header->uang_bayar,2) }} </td>
             </tr>
@@ -207,12 +215,14 @@
         </tbody>
     </table>
 
-    <p>Terbilang : {{ terbilang($header->total_bayar) }}</p>
+    <p>Terbilang : {{ ucwords(terbilang($header->total_bayar)) }}</p>
 
     <div class="">
         <p>{{ date('Y/m/d H:i:s') }}</p>
         <p>{{ strtoupper($header->fullname) }}</p>
     </div>
+    <br><br>
+    {!! DNS1D::getBarcodeHTML($header->no_transaksi, 'C128', 0.9, 45) !!}
 
 </body>
 

@@ -149,6 +149,7 @@
     </div>
 
     <div class="barcode">
+        {!! DNS1D::getBarcodeHTML($header->no_transaksi, 'C128', 1.3, 45) !!}
         <!-- <img src="https://via.placeholder.com/150x50.png?text=Barcode" alt="Barcode"> -->
     </div>
 

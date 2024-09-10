@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Modules\Administrator\App\Models\Category;
 use Modules\Administrator\App\Models\Customers;
 use Modules\Administrator\App\Models\Inbound;
 use Modules\Administrator\App\Models\LevelMember;
@@ -32,9 +33,9 @@ class DashboardController extends Controller
     public function countMember()
     {
         if (session()->get("customers_id") != "*") {
-            $data = LevelMember::count();
+            $data = Category::count();
         } else {
-            $data = LevelMember::count();
+            $data = Category::count();
         }
         return response()->json(['data' => $data]);
     }

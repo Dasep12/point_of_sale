@@ -426,7 +426,13 @@
             $('#UploadItemError').html("");
             $(".form-control").removeClass("parsley-error");
             $(".parsley-required").html("");
-            $("#actionUpload").val(idx)
+            $("#actionUpload").val(idx);
+
+            if (idx == "uploaditem") {
+                $('#format_upload').attr('href', '{{ asset("document/format_upload_material.xlsx") }}');
+            } else if (idx == "uploadharga") {
+                $('#format_upload').attr('href', '{{ asset("document/format_upload_harga.xlsx") }}');
+            }
         }
     }
 

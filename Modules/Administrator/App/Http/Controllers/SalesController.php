@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\LevelMember;
+use Modules\Administrator\App\Models\Pajak;
 use Modules\Administrator\App\Models\Sales;
 use Modules\Administrator\App\Models\Users;
 use Modules\Administrator\App\Models\Warehouse;
@@ -189,6 +190,7 @@ class SalesController extends Controller
             ->first();
         $data = [
             'store' => Warehouse::first(),
+            'pajak' => Pajak::first(),
             'user'  => Users::where('id', $header->created_by)->first(),
             'header' => $header,
             'detail' => DB::table("tbl_trn_detail_sales")

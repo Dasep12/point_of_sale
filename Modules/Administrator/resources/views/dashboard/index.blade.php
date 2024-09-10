@@ -31,7 +31,7 @@
                 <div class="tile-stats">
                     <div class="icon"><i class="fa fa-users"></i></div>
                     <div class="count countLevelMember">0</div>
-                    <h3>Level Member</h3>
+                    <h3>Total Kategori</h3>
                     <p></p>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                 <div class="tile-stats">
                     <div class="icon"><i class="fa fa-cubes"></i></div>
                     <div class="count countMaterial">0</div>
-                    <h3>Item</h3>
+                    <h3>Total Produk</h3>
                     <p></p>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                 <div class="tile-stats">
                     <div class="icon"><i class="fa fa-inbox"></i></div>
                     <div class="count countPenjualan" id="countPenjualan">0</div>
-                    <h3>Penjualan</h3>
+                    <h3>Total Penjualan</h3>
                     <p></p>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                 <div class="tile-stats">
                     <div class="icon"><i class="fa fa-dropbox"></i></div>
                     <div class="count countPembelian">0</div>
-                    <h3>Pembelian</h3>
+                    <h3>Total Pembelian</h3>
                     <p></p>
                 </div>
             </div>

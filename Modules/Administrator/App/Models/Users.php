@@ -212,7 +212,7 @@ class Users extends Model
                 );
                 array_push($menuItems, $data);
             }
-
+            //dd($menuItems);
             DB::table("tbl_sys_accesmenu")
                 ->insert($menuItems);
             try {

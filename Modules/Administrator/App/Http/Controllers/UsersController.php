@@ -37,8 +37,6 @@ class UsersController extends Controller
 
     public function jsonCreate(Request $req)
     {
-
-
         $resp = Users::jsonCreate($req);
         return response()->json(['msg' => $resp]);
     }
@@ -80,7 +78,7 @@ class UsersController extends Controller
                     'edit' => $checkedEditMenu != null ? in_array($allMenus[$key], $checkedEditMenu, true) : 0,
                     'delete' => $checkedEditMenu != null ? in_array($allMenus[$key], $checkedDeleteMenu, true) : 0,
                     'created_at' => date('Y-m-d H:i:s'),
-                    'created_by' => 1
+                    'created_by' => session()->get("user_id")
                 );
                 array_push($menuItems, $data);
             }
