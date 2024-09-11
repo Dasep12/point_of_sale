@@ -59,7 +59,7 @@ class Material extends Model
               ";
 
         if ($req->search) {
-            $qry .= " WHERE a.name_item like '%$req->search%' ";
+            $qry .= " WHERE a.name_item LIKE '%$req->search%'  ";
         }
         // Total count of records
         $countResult = DB::select($qry);
@@ -77,10 +77,10 @@ class Material extends Model
                 FROM tbl_mst_material a 
                 left join tbl_mst_units b on b.id = a.unit_id 
                 left join tbl_mst_rak f on f.id = a.location_id
-                left join tbl_mst_categories d on d.id = a.categori_id";
+                left join tbl_mst_categories d on d.id = a.categori_id ";
 
         if ($req->search) {
-            $qry .= " WHERE a.name_item LIKE '%$req->search%' ";
+            $qry .= " WHERE a.name_item like '%$req->search% ";
         }
 
 

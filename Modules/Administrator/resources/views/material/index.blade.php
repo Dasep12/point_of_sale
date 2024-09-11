@@ -19,7 +19,8 @@
             </div>
             <div class="x_content">
 
-
+                <!-- Button to Get Selected Row IDs -->
+                <button class="btn btn-sm btn-outline-secondary" id="getSelectedIds"><i class="fa fa-barcode"></i> Export Barcode</button>
 
                 <table id="jqGridMain"></table>
                 <div id="pager"></div>
@@ -55,7 +56,6 @@
             datatype: 'json',
             mtype: 'GET',
             postData: {
-                id: "",
                 search: $("#searching").val()
             }
         }).trigger('reloadGrid');
@@ -206,8 +206,9 @@
         gridview: true,
         width: 780,
         height: 350,
+        multiselect: true,
         rowNum: 20,
-        rowList: [10, 30, 50],
+        rowList: [20, 50, 100],
         shrinkToFit: false,
         pager: "#pager",
         loadComplete: function(data) {
@@ -221,6 +222,37 @@
                 var gridWidth = $('#jqGridMain').closest('.ui-jqgrid').parent().width();
                 $('#jqGridMain').jqGrid('setGridWidth', gridWidth);
             }).trigger('resize');
+        }
+    });
+
+    // Export Barcode
+    $("#getSelectedIds").click(function() {
+        var selectedRows = $("#jqGridMain").jqGrid('getGridParam', 'selarrrow');
+        if (selectedRows.length > 0) {
+            console.log(selectedRows);
+            $.ajax({
+                url: "{{ url('administrator/barcodeGenerate') }}",
+                method: "GET",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": selectedRows
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(res) {
+                    console.log(res)
+                    var blob = new Blob([res], {
+                        type: 'application/pdf'
+                    });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "Barcode" + '.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            })
         }
     });
 
@@ -313,6 +345,11 @@
             if (data.records === 0) {
                 $("#jqGridMainPrice").parent().append("<div class='d-flex justify-content-center no-data'><h3 class='text-secondary'>data not found</h3></div>");
             }
+
+            // Trigger grid resize when the window is resized
+            $(window).on('resize', function() {
+                resizeGrid();
+            });
         }
     });
 
@@ -377,10 +414,7 @@
         resizeGrid()
     });
 
-    // Trigger grid resize when the window is resized
-    $(window).on('resize', function() {
-        resizeGrid();
-    });
+
 
     function CrudMaterial(action, idx) {
 

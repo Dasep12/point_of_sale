@@ -13,6 +13,7 @@ use Modules\Administrator\App\Models\Price;
 use Modules\Administrator\App\Models\Units;
 use Modules\Administrator\App\Models\Warehouse;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PDF;
 
 class MaterialController extends Controller
 {
@@ -324,5 +325,25 @@ class MaterialController extends Controller
                 'message' => 'Error loading file: ' . $e->getMessage(),
             ]);
         }
+    }
+
+
+    public function barcodeGenerate(Request $req)
+    {
+        $id = ["15", "14", "13", "12", "11", "10", "9", "8", "7", "6"];
+        $sql = Material::whereIn('id', $req->id)
+            ->select('id', 'barcode', 'name_item')
+            ->get();
+
+
+        $data = [
+            'data' => $sql
+        ];
+        $pdf = PDF::loadView('administrator::material.partials.barcode', $data);
+
+        $pdf->setPaper('A4', 'portrait'); // 58mm width (226 pixels at 96 DPI)
+
+        return $pdf->stream('Barcode' . 'pdf'); // Show PDF in browser
+        //return response()->json($data);
     }
 }

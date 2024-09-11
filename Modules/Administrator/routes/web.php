@@ -62,6 +62,8 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDeleteMaterial', 'MaterialController@jsonDelete');
     Route::get('jsonLocationMaterialByWarehouse', 'MaterialController@jsonLocation');
     Route::post('uploadItemExcel', 'MaterialController@uploadItemExcel');
+    Route::get('barcodeGenerate', 'MaterialController@barcodeGenerate');
+
 
 
     // PRICE ROUTES 
