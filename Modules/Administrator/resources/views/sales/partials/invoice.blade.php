@@ -87,10 +87,10 @@
         <div class="company-info">
             <table>
                 <tr>
-                    <td align="center"><img style="height: 50px; width: 50px;" src="https://cdn-icons-png.flaticon.com/512/2981/2981297.png" alt=""></td>
-                    <td style=""><strong style="font-size:18px;">FAKTUR PENJUALAN</strong><br>
-                        <strong style="font-size:15px;">{{ $store->NameWarehouse }}</strong><br>
-                        {{ $store->Address }}<br>
+                    <td align="center"><img style="height: 60px; width: 60px;" src="./assets/images/{{  $store->logo }}"></td>
+                    <td style=""><strong style=" font-size:18px;">FAKTUR PENJUALAN</strong><br>
+                        <strong style="font-size:15px;">{{ $store->name_company }}</strong><br>
+                        {{ $store->address }}<br>
                         {{ $store->phone }}<br>
                     </td>
                 </tr>

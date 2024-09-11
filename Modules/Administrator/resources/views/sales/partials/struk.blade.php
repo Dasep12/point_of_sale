@@ -84,8 +84,8 @@
 
 <body>
     <div class="header">
-        <h1>{{ $store->NameWarehouse }}</h1>
-        <p>{{ $store->Address }}</p>
+        <h1>{{ $store->name_company }}</h1>
+        <p>{{ $store->address }}</p>
         <p>Tel: {{ $store->phone }}</p>
     </div>
 
@@ -154,7 +154,7 @@
     </div>
 
     <div class="footer">
-        <p>Powered by {{ $store->NameWarehouse }}</p>
+        <p>{{ $store->name_company }}</p>
     </div>
 </body>
 

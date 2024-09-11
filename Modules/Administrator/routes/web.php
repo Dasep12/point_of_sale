@@ -170,4 +170,10 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonListItemReporting', 'ReportingController@jsonListItemReporting');
     Route::get('exportReportSales', 'ReportingController@exportReportSales');
     Route::get('exportReportBeli', 'ReportingController@exportReportBeli');
+
+
+
+    // CMS ROUTES 
+    Route::get('cms', 'CmsController@index');
+    Route::post('updateCms', 'CmsController@updateCms');
 });

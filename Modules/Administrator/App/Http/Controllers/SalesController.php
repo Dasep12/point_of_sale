@@ -160,7 +160,7 @@ class SalesController extends Controller
         $header = DB::table("tbl_trn_header_trans")
             ->where('no_transaksi', $req->no_trans)->first();
         $data = [
-            'store' => Warehouse::first(),
+            'store' => DB::table('tbl_mst_cms')->first(),
             'user'  => Users::where('id', $header->created_by)->first(),
             'header' => $header,
             'detail' => DB::table("tbl_trn_detail_sales")
@@ -189,7 +189,7 @@ class SalesController extends Controller
             ->select('a.*', 'b.name_level', 'c.fullname')
             ->first();
         $data = [
-            'store' => Warehouse::first(),
+            'store' => DB::table('tbl_mst_cms')->first(),
             'pajak' => Pajak::first(),
             'user'  => Users::where('id', $header->created_by)->first(),
             'header' => $header,
