@@ -2,7 +2,11 @@
 @include('administrator::layouts.header')
 <!-- header menu -->
 <?php
+
+use Illuminate\Support\Facades\DB;
+
 $MenuUrl = "";
+$store_data = DB::table('tbl_mst_cms')->first();
 ?>
 
 <div id="fullPageLoader">
@@ -19,7 +23,7 @@ $MenuUrl = "";
             <div class="col-md-3 left_col menu_fixed">
                 <div class="left_col scroll-view">
                     <div class="navbar nav_title justify-content-center" style="border: 0;">
-                        <img style="width: 20%;height: 40px !important;" src="{{ asset('login/logo_pos.png') }}" alt="..." class=" profile_img">
+                        <img style="width: 20%;height: 40px !important;" src="{{ asset('assets/images/'.$store_data->logo) }}" alt="..." class=" profile_img">
                     </div>
 
                     <div class="clearfix"></div>
@@ -72,7 +76,7 @@ $MenuUrl = "";
                         <ul class=" navbar-right">
                             <li class="nav-item dropdown open" style="padding-left: 15px;">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                                    <img src="{{ asset('assets/images/user_2.png') }}" alt="">{{ ucwords(strtolower(session()->get("fullname"))) }}
+                                    <img src="{{ asset('assets/images/profile.png') }}" alt="">{{ ucwords(strtolower(session()->get("fullname"))) }}
                                 </a>
                                 <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                                     <!-- <a class="dropdown-item" href="#"> Profile</a> -->
