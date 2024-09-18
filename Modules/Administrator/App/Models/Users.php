@@ -134,6 +134,7 @@ class Users extends Model
             select tsa.accessmenu_id,tsa.add , tsa.edit , tsa.delete from tbl_sys_accesmenu tsa
             where user_id = '" . $req->user_id . "'
             )Y on Y.accessmenu_id = X.id 
+            WHERE a.StatusMenu = 1  
             ORDER BY 
             SUBSTRING(a.MenuUrut, 4) + 0,
             CASE
@@ -144,7 +145,7 @@ class Users extends Model
                 WHEN a.ParentMenu = '*' THEN 0 
                 ELSE SUBSTRING(a.MenuUrut, 4) + 0 
             END";
-        $query .= "  LIMIT  $start , $limit ";
+        $query .= " LIMIT  $start , $limit ";
         $data = DB::select($query);
 
         // Prepare rows for jqGrid

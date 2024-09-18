@@ -17,6 +17,15 @@
     .table-sm th {
         padding: 1px !important;
     }
+
+    #suggestions {
+        padding: 4px;
+        background: #726666;
+        color: #FFF;
+        font-size: 15px !important;
+        cursor: pointer;
+        display: none;
+    }
 </style>
 <div class="row">
     <div class="col-md-12 col-sm-12  ">
@@ -33,7 +42,6 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-
                 <table id="jqGridMain"></table>
                 <div id="pager"></div>
                 <hr>

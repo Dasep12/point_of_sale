@@ -235,14 +235,19 @@
                     type: 'POST',
                     data: data,
                     success: function(data) {
-                        // console.log(data);
-                        noTransaksi();
-                        ReloadBarang();
-                        doSuccess('create', 'Data Save To Record', 'success')
+                        console.log(data);
+                        if (data.success) {
+                            noTransaksi();
+                            ReloadBarang();
+                            dataSales = [];
+                            reloadgridItem(dataSales);
+                            doSuccess('create', 'Data Save To Record', 'success')
 
-                        if ($("#CrudActionBeli").val() == "update") {
-                            $('#modalCrudPembelian').modal('hide');
+                            if ($("#CrudActionBeli").val() == "update") {
+                                $('#modalCrudPembelian').modal('hide');
+                            }
                         }
+
                     },
                     error: function(xhr, desc, err) {
                         var respText = "";

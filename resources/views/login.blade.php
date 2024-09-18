@@ -24,9 +24,9 @@
 
     <style>
         body {
-            /* background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                url('login/bg_rim.jpg') !important; */
-            background-color: #35353c;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                url('login/bg-login_1.jpg') !important;
+            /* background-color: #35353c; */
             background-size: cover !important;
             background-position: center !important;
         }

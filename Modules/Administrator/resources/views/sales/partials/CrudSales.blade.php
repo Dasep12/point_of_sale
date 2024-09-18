@@ -59,7 +59,12 @@
                                 <label class="col-md-2 col-sm-3" for="first-name">Barcode <span class="required">*</span>
                                 </label>
                                 <div class="col-md-8 col-sm-6 ">
-                                    <input type="text" autocomplete="off" readonly name="barcode" placeholder="Scan Item Disini" rows="4" required class="form-control form-control-lg" id="barcode" />
+                                    <!-- <input type="text" autocomplete="off" name="barcode" placeholder="Scan Item Disini" rows="4" required class="form-control form-control-lg" id="barcode" />
+                                     -->
+
+                                    <select style="width: 100%;" name="barcode" placeholder="Scan Barcode Here" class="select2 js-example-matcher-start" id="barcode">
+                                    </select>
+                                    <div id="suggestions"></div>
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -184,32 +189,50 @@
     </div>
 
     <script>
-        document.addEventListener('keydown', function(event) {
-            if (event.key == 'Tab') {
-                var bcd = document.getElementById("barcode");
-                bcd.focus();
-            } else if (event.key === 'b') {
-                // Trigger the button click
-                document.getElementById('btnBayarTrans').click();
-            } else if (event.key === 'q') {
-                $("#barcode").attr("readonly", true)
-                $("#barcode").val("");
-                $("#qty").focus();
-            } else if (event.key === 'p') {
-                document.getElementById('btnPrintStruk').click();
-            } else if (event.key === 'x') {
-                document.getElementById('btnCancel').click();
-            } else if (event.key === 'e') {
-                document.getElementById('btnReset').click();
-            } else if (event.key === 'u') {
-                var ub = document.getElementById("uang_bayar_pref");
-                ub.focus();
-            } else if (event.key === 's') {
-                $("#barcode").attr("readonly", false)
-                var bc = document.getElementById("barcode");
-                bc.focus();
-            }
+        $("#barcode").select2({
+            // matcher: matchStart,
+            placeholder: "Select a state",
+            allowClear: true,
+            dropdownParent: $('#modalCrudSales'),
+            ajax: {
+                url: "{{ url('administrator/searchMaterial') }}", // Your server endpoint that returns the data
+                dataType: 'json', // The data type expected from the server
+                delay: 250, // Delay in ms before the request is sent
+                data: function(params) {
+                    return {
+                        search: params.term, // Search term (what the user types)
+                        page: params.page || 1 // Pagination (optional)
+                    };
+                },
+                processResults: function(data, params) {
+                    // Parse the results into the format expected by Select2
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items, // The array of results from the server
+                        pagination: {
+                            more: data.pagination.more // Indicates if there are more pages to load
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search Barcode', // Placeholder text
+            minimumInputLength: 1, // Minimum number of characters before search begins
+            templateResult: formatResult, // Optional function to customize how results are displayed
+            templateSelection: formatSelection
         });
+
+        function formatResult(repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+            return '' + repo.text + '';
+        }
+
+        function formatSelection(repo) {
+            return repo.text || repo.id;
+        }
 
         function noTransaksi() {
             $.ajax({
@@ -226,6 +249,18 @@
             })
         }
         noTransaksi()
+
+        // Capture Enter keypress within the Select2 dropdown
+        $(document).on('keydown', '.select2-search__field', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent the default behavior
+                var selectedValue = $('#barcode').val();
+                if (selectedValue) {
+                    getPrice()
+                    $('#barcode').val(null).trigger('change');
+                }
+            }
+        });
 
         document.getElementById('uang_bayar_pref').addEventListener('input', function(e) {
             var value = this.value.replace(/[^,\d]/g, '').toString();
@@ -293,6 +328,58 @@
             }
         })
 
+        // document.getElementById('barcode').addEventListener('input', function() {
+        //     const query = this.value;
+        //     if (query.length >= 2) { // Trigger AJAX request if input length > 2
+        //         $.ajax({
+        //             url: "{{ url('administrator/getJsonMaterial') }}",
+        //             method: 'GET',
+        //             data: {
+        //                 barcode: $("#barcode").val(),
+        //                 member_id: $("#member_id").val(),
+        //             },
+        //             complete: function() {
+        //                 document.getElementById("suggestions").style.display = "block";
+        //             },
+        //             success: function(response) {
+        //                 const suggestionsDiv = document.getElementById('suggestions');
+        //                 suggestionsDiv.innerHTML = '';
+        //                 if (response.length > 0) {
+        //                     response.forEach(function(suggestion) {
+        //                         const suggestionElement = document.createElement('div');
+        //                         suggestionElement.innerHTML = suggestion.name_item; // Assuming 'name' is a property in your response
+        //                         suggestionElement.addEventListener('click', function() {
+        //                             document.getElementById('barcode').value = suggestion.barcode;
+        //                             suggestionsDiv.innerHTML = ''; // Clear suggestions after selection
+        //                             document.getElementById("suggestions").style.display = "none";
+        //                             getPrice()
+        //                         });
+
+        //                         suggestionsDiv.appendChild(suggestionElement);
+        //                     });
+        //                 } else {
+        //                     const suggestionElement = document.createElement('div');
+        //                     suggestionElement.innerHTML = "Product Not Found"; // Assuming 'name' is a property in your response
+        //                     suggestionElement.addEventListener('click', function() {
+        //                         document.getElementById('barcode').value = "";
+        //                         suggestionsDiv.innerHTML = ''; // Clear suggestions after selection
+        //                         document.getElementById("suggestions").style.display = "none";
+        //                     });
+
+        //                     suggestionsDiv.appendChild(suggestionElement);
+        //                 }
+
+        //             },
+        //             error: function(error) {
+        //                 console.error('Error fetching suggestions:', error);
+        //             }
+        //         });
+        //     } else {
+        //         document.getElementById('suggestions').innerHTML = ''; // Clear suggestions if input is too short
+        //         document.getElementById("suggestions").style.display = "none";
+        //     }
+        // })
+
         $("#formGetList").parsley();
         $('#formGetList').submit(function(e) {
             e.preventDefault();
@@ -305,73 +392,127 @@
 
             if (f.parsley().isValid()) {
                 var qty = document.getElementById("qty");
-                $("#barcode").attr("readonly", true);
                 qty.focus();
-
-
-                $.ajax({
-                    url: '{{ url("administrator/getPrice") }}',
-                    method: "GET",
-                    type: 'GET',
-                    data: {
-                        'barcode': $("#barcode").val(),
-                        'member_id': $("#member_id").val()
-                    },
-                    success: function(data) {
-                        var resp = data;
-                        if (data.msg == "ok") {
-                            var params = resp.data[0];
-                            var datas = {
-                                id: params.material_id,
-                                item_id: params.material_id,
-                                item_name: params.name_item,
-                                satuan_id: params.unit_id,
-                                satuan: params.unit_code,
-                                kode_item: params.kode_item,
-                                merek: params.merek,
-                                qty: $("#qty").val(),
-                                harga_jual: params.harga_jual,
-                                discount: parseFloat($("#discount").val()),
-                                subtotal: (parseInt($("#qty").val()) * params.harga_jual),
-                                total: (parseInt($("#qty").val()) * params.harga_jual) - parseFloat($("#discount").val())
-                            }
-                            if (materialExists(params.material_id)) {
-                                doSuccess('create', 'item sudah masuk list', 'error')
-                            } else {
-                                dataSales.push(datas);
-                            }
-                            reloadgridItem(dataSales);
-
-                            countPrice();
-
-                        } else {
-                            doSuccess('create', resp.data, 'error')
-                        }
-                        $("#qty").val("");
-                        $("#barcode").val("");
-                        $("#uang_bayar").val("");
-                        $("#uang_bayar_pref").val("");
-                        $("#kembalian").val("");
-                        $("#kembalian_pref").val("");
-                        $("#discount").val(0)
-                    },
-                    error: function(xhr, desc, err) {
-                        var respText = "";
-                        try {
-                            respText = eval(xhr.responseText);
-                        } catch {
-                            respText = xhr.responseText;
-                        }
-
-                        respText = unescape(respText).replaceAll("_n_", "<br/>")
-
-                        var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
-                        // $('#crudCustomersError').html(errMsg);
-                    },
-                });
+                getPrice()
             }
-
         })
+
+        function getPrice() {
+            $.ajax({
+                url: '{{ url("administrator/getPrice") }}',
+                method: "GET",
+                type: 'GET',
+                data: {
+                    'barcode': $("#barcode").val(),
+                    'member_id': $("#member_id").val()
+                },
+                success: function(data) {
+                    var resp = data;
+                    if (data.msg == "ok") {
+                        var params = resp.data[0];
+                        var datas = {
+                            id: params.material_id,
+                            item_id: params.material_id,
+                            item_name: params.name_item,
+                            satuan_id: params.unit_id,
+                            satuan: params.unit_code,
+                            kode_item: params.kode_item,
+                            merek: params.merek,
+                            qty: $("#qty").val(),
+                            harga_jual: params.harga_jual,
+                            discount: parseFloat($("#discount").val()),
+                            subtotal: (parseInt($("#qty").val()) * params.harga_jual),
+                            total: (parseInt($("#qty").val()) * params.harga_jual) - parseFloat($("#discount").val())
+                        }
+                        var totales = (parseInt($("#qty").val()) * params.harga_jual) - parseFloat($("#discount").val());
+                        if (materialExists(params.material_id)) {
+                            updateQuantity(dataSales, params.material_id, $("#qty").val(), params.harga_jual, totales)
+                            // doSuccess('create', 'item sudah masuk list', 'error')
+                        } else {
+                            dataSales.push(datas);
+                        }
+                        reloadgridItem(dataSales);
+                        countPrice();
+
+                    } else {
+                        doSuccess('create', resp.data, 'error')
+                    }
+                    $("#qty").val("");
+                    $("#barcode").val("");
+                    $("#uang_bayar").val("");
+                    $("#uang_bayar_pref").val("");
+                    $("#kembalian").val("");
+                    $("#kembalian_pref").val("");
+                    $("#discount").val(0);
+                    document.getElementById("suggestions").style.display = "none";
+                    $("#qty").focus();
+                },
+                error: function(xhr, desc, err) {
+                    var respText = "";
+                    try {
+                        respText = eval(xhr.responseText);
+                    } catch {
+                        respText = xhr.responseText;
+                    }
+                    respText = unescape(respText).replaceAll("_n_", "<br/>")
+                    var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
+                    // $('#crudCustomersError').html(errMsg);
+                },
+            });
+        }
+
+        function updateQuantity(itemArray, itemId, newQty, harga, total) {
+            itemArray.forEach(obj => {
+                let qtyNew = parseFloat(obj.qty) + parseFloat(newQty)
+                if (obj.item_id == itemId) {
+                    obj.qty = qtyNew;
+                    obj.subtotal = qtyNew * parseFloat(harga);
+                    obj.total = parseFloat(obj.total) + parseFloat(total);
+                }
+            });
+        }
+
+        // Reset validation on modal show
+        $('#modalCrudSales').on('show.bs.modal', function() {
+            document.addEventListener('keydown', function(event) {
+                if (event.key == 'Tab') {
+                    var bcd = document.getElementById("barcode");
+                    bcd.focus();
+                } else if (event.key === 'b' || event.key === 'B') {
+                    // Trigger the button click
+                    document.getElementById('btnBayarTrans').click();
+                } else if (event.key === 'q' || event.key === 'Q') {
+                    $("#qty").focus();
+                } else if (event.key === 'p' || event.key === 'P') {
+                    document.getElementById('btnPrintStruk').click();
+                } else if (event.key === 'x' || event.key === 'X') {
+                    document.getElementById('btnCancel').click();
+                } else if (event.key === 'e' || event.key === 'E') {
+                    document.getElementById('btnReset').click();
+                } else if (event.key === 'u' || event.key === 'U') {
+                    var ub = document.getElementById("uang_bayar_pref");
+                    ub.focus();
+                } else if (event.key === 's' || event.key === 'S') {
+                    // $("#barcode").attr("readonly", false)
+                    // var bc = document.getElementById("barcode");
+                    // bc.focus();
+                    // // Ensure the input remains cleared (in case of timing issues)
+                    // setTimeout(function() {
+                    //     bc.value = "";
+                    // }, 10);
+                    event.preventDefault(); // Prevent the default action
+
+                    // Open the Select2 dropdown
+                    $('#barcode').select2('open');
+
+                    // Wait for dropdown to open and focus on the search field
+                    setTimeout(function() {
+                        // Focus the search input within the dropdown
+                        $('.select2-search__field').focus();
+                    }, 100); // Small delay to ensure the dropdown is fully open
+                }
+            });
+        });
 
 
 

@@ -59,7 +59,7 @@ class Material extends Model
               ";
 
         if ($req->search) {
-            $qry .= " WHERE a.name_item LIKE '%$req->search%'  ";
+            $qry .= " WHERE name_item LIKE '%$req->search%'  ";
         }
         // Total count of records
         $countResult = DB::select($qry);
@@ -80,8 +80,9 @@ class Material extends Model
                 left join tbl_mst_categories d on d.id = a.categori_id ";
 
         if ($req->search) {
-            $qry .= " WHERE a.name_item like '%$req->search% ";
+            $query .= " WHERE name_item like '%$req->search%' ";
         }
+
 
 
 

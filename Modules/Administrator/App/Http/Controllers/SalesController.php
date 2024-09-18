@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\LevelMember;
+use Modules\Administrator\App\Models\Material;
 use Modules\Administrator\App\Models\Pajak;
 use Modules\Administrator\App\Models\Sales;
 use Modules\Administrator\App\Models\Users;
@@ -253,5 +254,38 @@ class SalesController extends Controller
     public function jsonNoTransaksi(Request $req)
     {
         return getNoTransaksi();
+    }
+
+    public function getJsonMaterial(Request $req)
+    {
+        $data = DB::table('vw_master_price')
+            ->where('barcode', 'LIKE', '%' . $req->barcode . '%')
+            ->where('member_id', $req->member_id)
+            ->select('*')
+            ->get();
+        return response()->json($data);
+    }
+
+    public function searchMaterial(Request $request)
+    {
+        $search = $request->input('search');
+
+        $material = Material::where('barcode', 'like', '%' . $search . '%')
+            ->orWhere('name_item', 'like', '%' . $search . '%')
+            ->paginate(10); // Paginate results
+
+        $results = [];
+
+        foreach ($material as $supplier) {
+            $results[] = [
+                'id' => $supplier->barcode,
+                'text' => $supplier->name_item . ' ' . $supplier->barcode,
+            ];
+        }
+
+        return response()->json([
+            'items' => $results,
+            'pagination' => ['more' => $material->hasMorePages()]
+        ]);
     }
 }

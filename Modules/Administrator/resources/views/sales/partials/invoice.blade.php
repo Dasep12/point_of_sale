@@ -149,9 +149,9 @@
                 <td>{{ $dt->item_name }}</td>
                 <td class="right-align">{{ $dt->out_stock }}</td>
                 <td>{{ $dt->unit_name }}</td>
-                <td class="right-align">{{ number_format($dt->harga_jual,2) }}</td>
-                <td class="right-align">{{ number_format($dt->discount,2) }}</td>
-                <td class="right-align">{{ number_format($dt->harga_jual * $dt->out_stock,2) }}</td>
+                <td class="right-align">{{ number_format($dt->harga_jual) }}</td>
+                <td class="right-align">{{ number_format($dt->discount) }}</td>
+                <td class="right-align">{{ number_format($dt->harga_jual * $dt->out_stock) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -169,7 +169,7 @@
                 <td class="right-align">Jml Item </td>
                 <td class="right-align">: {{ $detail->count() }} </td>
                 <td class="right-align">Sub Total </td>
-                <td class="right-align">: {{ number_format($header->sub_total,2) }}</td>
+                <td class="right-align">: {{ number_format($header->sub_total) }}</td>
             </tr>
             <tr>
                 <td>Hormat Kami</td>
@@ -177,7 +177,15 @@
                 <td></td>
                 <td class="text-center"></td>
                 <td class="right-align">Total Potongan </td>
-                <td class="right-align">: {{ number_format($header->total_potongan,2) }} </td>
+                <td class="right-align">: {{ number_format($header->total_potongan) }} </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="right-align">{{ $pajak->name }} ({{ $pajak->persentase . '%' }})</td>
+                <td class="right-align">: {{ number_format($header->total_bayar * $pajak->persentase / 100  ) }} </td>
 
             </tr>
             <tr>
@@ -186,23 +194,15 @@
                 <td></td>
                 <td></td>
                 <td class="right-align">Total Akhir </td>
-                <td class="right-align">: {{ number_format($header->total_bayar,2) }}</td>
+                <td class="right-align">: {{ number_format($header->total_bayar) }}</td>
             </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="right-align">{{ $pajak->name }} ({{ $pajak->persentase . '%' }})</td>
-                <td class="right-align">: {{ number_format($header->total_bayar * $pajak->persentase / 100  ,2) }} </td>
-            </tr>
-            <tr>
+            <!-- <tr>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td class="right-align">Tunai </td>
-                <td class="right-align">: {{ number_format($header->uang_bayar,2) }} </td>
+                <td class="right-align">: {{ number_format($header->uang_bayar) }} </td>
             </tr>
             <tr>
                 <td>(...................)</td>
@@ -210,8 +210,8 @@
                 <td></td>
                 <td></td>
                 <td class="right-align">Kembali </td>
-                <td class="right-align">: {{ number_format($header->kembalian,2) }} </td>
-            </tr>
+                <td class="right-align">: {{ number_format($header->kembalian) }} </td>
+            </tr> -->
         </tbody>
     </table>
 

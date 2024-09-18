@@ -71,11 +71,10 @@ class PembelianController extends Controller
 
     public function getJsonPriceBeli(Request $req)
     {
+        $data = DB::table('vw_master_price')
+            ->where(['barcode' => $req->barcode])
+            ->select('*');
         try {
-            $data = DB::table('vw_master_price')
-                ->where(['barcode' => $req->barcode])
-                ->select('*');
-
             if ($data->count() > 0) {
                 $resp = ["msg" => "ok", "data" => $data->get()];
                 return response()->json($resp);

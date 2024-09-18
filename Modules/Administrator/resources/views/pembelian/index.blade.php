@@ -33,7 +33,7 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-
+                div.
                 <table id="jqGridMain"></table>
                 <div id="pager"></div>
                 <hr>

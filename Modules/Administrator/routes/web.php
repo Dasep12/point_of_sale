@@ -132,6 +132,8 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonSales', 'SalesController@jsonSales');
     Route::get('jsonDetailSales', 'SalesController@jsonDetailSales');
     Route::get('getPrice', 'SalesController@getJsonPrice');
+    Route::get('getJsonMaterial', 'SalesController@getJsonMaterial');
+    Route::get('searchMaterial', 'SalesController@searchMaterial');
     Route::post('jsonSaveTransaksi', 'SalesController@jsonSaveTransaksi');
     Route::post('jsonCancelTransaksi', 'SalesController@jsonCancelTransaksi');
     Route::get('jsonDeleteSales', 'SalesController@jsonDeleteSales');

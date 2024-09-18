@@ -110,11 +110,9 @@ class MaterialController extends Controller
         ]);
 
         $file = $request->file('file_upload');
-
         try {
             // Load the spreadsheet
-            $spreadsheet = IOFactory::load($file->getRealPath());
-
+            $spreadsheet = IOFactory::load($file->getPathname());
             // Get the active sheet
             $sheet = $spreadsheet->getActiveSheet();
             $rowCount = $sheet->getHighestRow();
@@ -263,7 +261,7 @@ class MaterialController extends Controller
 
         try {
             // Load the spreadsheet
-            $spreadsheet = IOFactory::load($file->getRealPath());
+            $spreadsheet = IOFactory::load($file->getPathname());
 
             // Get the active sheet
             $sheet = $spreadsheet->getActiveSheet();
@@ -330,7 +328,7 @@ class MaterialController extends Controller
 
     public function barcodeGenerate(Request $req)
     {
-        $id = ["15", "14", "13", "12", "11", "10", "9", "8", "7", "6"];
+        // $id = ["15", "14", "13", "12", "11", "10", "9", "8", "7", "6"];
         $sql = Material::whereIn('id', $req->id)
             ->select('id', 'barcode', 'name_item')
             ->get();
@@ -339,7 +337,7 @@ class MaterialController extends Controller
         $data = [
             'data' => $sql
         ];
-        $pdf = PDF::loadView('administrator::material.partials.barcode', $data);
+        $pdf = PDF::loadView('administrator::material.partials.Barcode', $data);
 
         $pdf->setPaper('A4', 'portrait'); // 58mm width (226 pixels at 96 DPI)
 
