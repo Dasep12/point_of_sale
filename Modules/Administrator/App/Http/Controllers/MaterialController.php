@@ -344,4 +344,14 @@ class MaterialController extends Controller
         return $pdf->stream('Barcode' . 'pdf'); // Show PDF in browser
         //return response()->json($data);
     }
+
+    public function downloadExcelFormatMaterial(Request $req)
+    {
+        $filePath = public_path('document/' . $req->file);
+
+        return response()->download($filePath, $req->file, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="materials.xlsx"',
+        ]);
+    }
 }

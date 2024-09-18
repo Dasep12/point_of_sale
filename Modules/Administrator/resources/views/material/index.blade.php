@@ -6,10 +6,10 @@
     <div class="col-md-12 col-sm-12  ">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Material </h2>
+                <h2>Product </h2>
                 <div class="nav navbar-right panel_toolbox">
                     <div class="input-group">
-                        <input type="text" id="searching" class="form-control form-control-sm" placeholder="Search Name Item or Kode Item..">
+                        <input type="text" id="searching" class="form-control form-control-sm" placeholder="Search Name Item">
                         <span class="input-group-btn">
                             <button onclick="search()" id="searchBtn" class="btn-filter btn btn-secondary btn-sm" type="button"><i class="fa fa-search"></i> Search</button>
                         </span>
@@ -422,7 +422,7 @@
             document.getElementById("formCrudMaterial").reset();
             $("#formCrudMaterial .form-control,#formCrudMaterial .checkeds").prop("disabled", false);
             $(".btn-title").html('<i class="fa fa-save"></i> Create')
-            $("#titleModal").html('Create Material')
+            $("#titleModal").html('Create Product')
             $('#modalCrudMaterial').modal('show');
             $('#CrudMaterialError').html("");
             $("#CrudMaterialAction").val('create');
@@ -434,7 +434,7 @@
         } else if (action == "update") {
             document.getElementById("formCrudMaterial").reset();
             $(".btn-title").html('<i class="fa fa-save"></i> Update')
-            $("#titleModal").html('Update Material')
+            $("#titleModal").html('Update Product')
             $('#modalCrudMaterial').modal('show');
             $('#CrudMaterialError').html("");
             $("#CrudMaterialAction").val('update')
@@ -445,7 +445,7 @@
         } else if (action == "delete") {
             document.getElementById("formCrudMaterial").reset();
             $(".btn-title").html('<i class="fa fa-trash"></i> Delete')
-            $("#titleModal").html('Delete Material')
+            $("#titleModal").html('Delete Product')
             $('#modalCrudMaterial').modal('show');
             $('#CrudMaterialError').html("");
             $("#CrudMaterialAction").val('delete')
@@ -463,9 +463,11 @@
             $("#actionUpload").val(idx);
 
             if (idx == "uploaditem") {
-                $('#format_upload').attr('href', '{{ asset("document/format_upload_material.xlsx") }}');
+                // $('#format_upload').attr('href', '{{ asset("document/format_upload_material.xlsx") }}');
+                $('#format_upload').attr('href', '{{ url("administrator/downloadExcelFormatMaterial?file=format_upload_material.xls") }}');
             } else if (idx == "uploadharga") {
-                $('#format_upload').attr('href', '{{ asset("document/format_upload_harga.xlsx") }}');
+                // $('#format_upload').attr('href', '{{ asset("document/format_upload_harga.xlsx") }}');
+                $('#format_upload').attr('href', '{{ url("administrator/downloadExcelFormatMaterial?file=format_upload_harga.xls") }}');
             }
         }
     }
