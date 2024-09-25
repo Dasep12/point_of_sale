@@ -96,8 +96,8 @@ class Units extends Model
             try {
                 DB::table('tbl_mst_units')
                     ->insert([
-                        'name_unit'     => $req->name_unit,
-                        'code_unit'     => $req->code_unit,
+                        'unit_name'     => $req->unit_name,
+                        'unit_code'     => $req->unit_code,
                         'status_unit'   => $req->status_unit == null ? 0 : 1,
                         'remarks'       => $req->remarks,
                         'created_at'    => date('Y-m-d H:i:s'),

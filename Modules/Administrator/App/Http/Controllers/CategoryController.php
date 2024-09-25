@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Modules\Administrator\App\Models\Category;
+use Modules\Administrator\App\Models\Material;
 
 class CategoryController extends Controller
 {
@@ -65,8 +66,13 @@ class CategoryController extends Controller
 
     public function jsonDelete(Request $req)
     {
-        $resp  = Category::jsonDelete($req);
-        return response()->json(['msg' => $resp]);
+        $material = Material::where('categori_id', $req->id);
+        if ($material->count() > 0) {
+            return response()->json(['msg' => 'Category Masih Terikat di Product Aktif,Tidak Bisa di Hapus']);
+        } else {
+            $resp  = Category::jsonDelete($req);
+            return response()->json(['msg' => $resp]);
+        }
     }
 
     public function jsonForListCategory(Request $request)

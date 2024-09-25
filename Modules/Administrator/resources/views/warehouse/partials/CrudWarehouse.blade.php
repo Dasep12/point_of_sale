@@ -129,6 +129,7 @@
                         ReloadBarang();
                         doSuccess('create', 'success ' + act + ' data', 'success')
                     } else {
+                        console.log(data.msg)
                         var errMsg = '<div class="col-md-12"><div class="alert alert-warning mt-2" role="alert"><small><b> Error !</b><br/>' + data.msg + '</small></div></div>'
                         $('#CrudWarehouseError').html(errMsg);
                     }

@@ -62,7 +62,7 @@ class SalesController extends Controller
                 $resp = ["msg" => "ok", "data" => $data->get()];
                 return response()->json($resp);
             } else {
-                $resp = ["msg" => "nok", "data" => "item not found"];
+                $resp = ["msg" => "nok", "data" => "harga jual produk belum ditentukan"];
                 return response()->json($resp);
             }
         } catch (\Exception $e) {

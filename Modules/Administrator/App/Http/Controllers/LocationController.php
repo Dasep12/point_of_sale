@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Modules\Administrator\App\Models\Location;
+use Modules\Administrator\App\Models\Material;
 use Modules\Administrator\App\Models\Warehouse;
 
 class LocationController extends Controller
@@ -71,8 +72,13 @@ class LocationController extends Controller
 
     public function jsonDelete(Request $req)
     {
-        $resp  = Location::jsonDelete($req);
-        return response()->json(['msg' => $resp]);
+        $material = Material::where('location_id', $req->id);
+        if ($material->count() > 0) {
+            return response()->json(['msg' => 'Location Masih Terikat di Product Aktif,Tidak Bisa di Hapus']);
+        } else {
+            $resp  = Location::jsonDelete($req);
+            return response()->json(['msg' => $resp]);
+        }
     }
 
     public function jsonForListLocation(Request $request)
