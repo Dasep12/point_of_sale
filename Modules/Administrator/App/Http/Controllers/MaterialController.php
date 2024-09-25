@@ -14,6 +14,7 @@ use Modules\Administrator\App\Models\Units;
 use Modules\Administrator\App\Models\Warehouse;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PDF;
+use Svg\Tag\Rect;
 
 class MaterialController extends Controller
 {
@@ -95,6 +96,20 @@ class MaterialController extends Controller
     {
         $resp  = Material::jsonDelete($req);
         return response()->json(['msg' => $resp]);
+    }
+
+    public function jsonmultidelete(Request $req)
+    {
+        DB::beginTransaction();
+        try {
+            DB::table('tbl_mst_harga')->whereIn('material_id', $req->id)->delete();
+            DB::table('tbl_mst_material')->whereIn('id', $req->id)->delete();
+            DB::commit();
+            return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+        }
     }
 
     public function jsonLocation(Request $req)

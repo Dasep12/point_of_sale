@@ -63,6 +63,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonLocationMaterialByWarehouse', 'MaterialController@jsonLocation');
     Route::post('uploadItemExcel', 'MaterialController@uploadItemExcel');
     Route::get('barcodeGenerate', 'MaterialController@barcodeGenerate');
+    Route::get('multidelete', 'MaterialController@jsonmultidelete');
     Route::get('downloadExcelFormatMaterial', 'MaterialController@downloadExcelFormatMaterial');
 
 

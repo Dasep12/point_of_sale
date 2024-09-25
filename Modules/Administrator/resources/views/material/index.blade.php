@@ -19,8 +19,19 @@
             </div>
             <div class="x_content">
 
-                <!-- Button to Get Selected Row IDs -->
-                <button class="btn btn-sm btn-outline-secondary" id="getSelectedIds"><i class="fa fa-barcode"></i> Export Barcode</button>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-inline">
+                            <!-- Button to Get Selected Row IDs -->
+                            <button class="btn btn-sm btn-outline-secondary" id="getSelectedIds"><i class="fa fa-barcode"></i> Export Barcode</button>
+
+                            <button style="display: none;" class="btn btn-sm btn-outline-danger" id="getSelectedIdxDelete"><i class="fa fa-trash"></i> Delete</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
 
                 <table id="jqGridMain"></table>
                 <div id="pager"></div>
@@ -256,25 +267,74 @@
         }
     });
 
-    // Export Barcode
-    $("#getSelectedIds").click(function() {
+    function doSuccess(act, msg, theme) {
+        const myNotification = window.createNotification({
+            // options here
+            displayCloseButton: true,
+            theme: theme //success error , information , success
+        });
+
+        myNotification({
+            title: 'Information',
+            message: msg
+        });
+    }
+
+    // Delete Multiple
+    $('#jqGridMain').on('jqGridSelectRow jqGridSelectAll', function() {
         var selectedRows = $("#jqGridMain").jqGrid('getGridParam', 'selarrrow');
         if (selectedRows.length > 0) {
-            console.log(selectedRows);
-            // $.ajax({
-            //     url: "{{ url('administrator/multidelete') }}",
-            //     method: "GET",
-            //     data: {
-            //         "_token": "{{ csrf_token() }}",
-            //         "id": selectedRows
-            //     },
-            //     xhrFields: {
-            //         responseType: 'blob'
-            //     },
-            //     success: function(res) {
+            document.getElementById("getSelectedIdxDelete").style.display = "block";
 
-            //     }
-            // })
+            $("#getSelectedIdxDelete").off('click').on('click', function() {
+                $.confirm({
+                    title: 'Perhatian!',
+                    content: 'Delete Material ?',
+                    buttons: {
+                        yes: {
+                            btnClass: 'btn-danger',
+                            action: function() {
+                                $.ajax({
+                                    url: "{{ url('administrator/multidelete') }}",
+                                    method: "GET",
+                                    data: {
+                                        "_token": "{{ csrf_token() }}",
+                                        "id": selectedRows
+                                    },
+                                    success: function(res) {
+                                        if (res.success) {
+                                            ReloadBarang();
+                                            doSuccess('delete', 'success delete data', 'success')
+                                        } else {
+                                            alert(res.msg)
+                                        }
+                                    },
+                                    error: function(xhr, desc, err) {
+                                        var respText = "";
+                                        try {
+                                            respText = eval(xhr.responseText);
+                                        } catch {
+                                            respText = xhr.responseText;
+                                        }
+
+                                        respText = unescape(respText).replaceAll("_n_", "<br/>")
+
+                                        var errMsg = ' Error ' + xhr.status + '!</b><br/>' + respText + '</small>'
+                                        alert(errMsg);
+                                    },
+                                })
+                            }
+                        },
+                        no: {
+                            btnClass: 'btn-blue',
+                            action: function() {}
+                        },
+                    }
+                });
+            })
+
+        } else {
+            document.getElementById("getSelectedIdxDelete").style.display = "none";
         }
     });
 
