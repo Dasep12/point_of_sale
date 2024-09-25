@@ -52,7 +52,8 @@
                                 <label class="col-md-2 col-sm-3" for="first-name">Barcode <span class="required">*</span>
                                 </label>
                                 <div class="col-md-8 col-sm-6 ">
-                                    <input type="text" autocomplete="off" name="barcode" placeholder="Scan Item Disini" required class="form-control form-control-sm" id="barcode" />
+                                    <select style="width: 100%;" name="barcode" placeholder="Scan Barcode Here" class="select2 js-example-matcher-start" name="barcode" id="barcode">
+                                    </select>
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -110,6 +111,63 @@
             }
         });
 
+        $("#barcode").select2({
+            // matcher: matchStart,
+            placeholder: "Select a state",
+            allowClear: true,
+            dropdownParent: $('#modalCrudAdjust'),
+            ajax: {
+                url: "{{ url('administrator/searchMaterial') }}", // Your server endpoint that returns the data
+                dataType: 'json', // The data type expected from the server
+                delay: 250, // Delay in ms before the request is sent
+                data: function(params) {
+                    return {
+                        search: params.term, // Search term (what the user types)
+                        page: params.page || 1 // Pagination (optional)
+                    };
+                },
+                processResults: function(data, params) {
+                    // Parse the results into the format expected by Select2
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items, // The array of results from the server
+                        pagination: {
+                            more: data.pagination.more // Indicates if there are more pages to load
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search Barcode', // Placeholder text
+            minimumInputLength: 1, // Minimum number of characters before search begins
+            templateResult: formatResult, // Optional function to customize how results are displayed
+            templateSelection: formatSelection
+        });
+
+        function formatResult(repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+            return '' + repo.text + '';
+        }
+
+        function formatSelection(repo) {
+            return repo.text || repo.id;
+        }
+
+        // Capture Enter keypress within the Select2 dropdown
+        $(document).on('keydown', '.select2-search__field', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent the default behavior
+                var selectedValue = $('#barcode').val();
+                if (selectedValue) {
+                    getPrice()
+                    $('#barcode').val(null).trigger('change');
+                }
+            }
+        });
+
         function noTransaksi() {
             $.ajax({
                 url: '{{ url("administrator/jsonNoTransaksiAdjust") }}',
@@ -152,62 +210,68 @@
             if (f.parsley().isValid()) {
                 var qty = document.getElementById("qty");
                 qty.focus();
-                $.ajax({
-                    url: '{{ url("administrator/getJsonPriceBeli") }}',
-                    method: "GET",
-                    type: 'GET',
-                    data: {
-                        'barcode': $("#barcode").val(),
-                    },
-                    success: function(data) {
-                        var resp = data;
-                        if (data.msg == "ok") {
-                            var params = resp.data[0];
-                            var datas = {
-                                id: params.material_id,
-                                item_id: params.material_id,
-                                item_name: params.name_item,
-                                satuan_id: params.unit_id,
-                                satuan: params.unit_code,
-                                kode_item: params.kode_item,
-                                merek: params.merek,
-                                qty: $("#qty").val(),
-                                supplier: $("#supplier").val(),
-                                hpp: parseFloat($("#hpp").val()),
-                                total: parseFloat($("#qty").val()) * parseFloat($("#hpp").val())
-                            }
-                            if (materialExists(params.material_id)) {
-                                doSuccess('create', 'item sudah masuk list', 'error')
-                            } else {
-                                dataSales.push(datas);
-                            }
-                            let totalBayar = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
-                            $("#total_bayar").val(totalBayar);
-                            reloadgridItem(dataSales);
-                        } else {
-                            doSuccess('create', resp.data, 'error')
-                        }
-                        $("#qty").val("");
-                        $("#hpp").val("");
-                        $("#barcode").val("");
-                    },
-                    error: function(xhr, desc, err) {
-                        var respText = "";
-                        try {
-                            respText = eval(xhr.responseText);
-                        } catch {
-                            respText = xhr.responseText;
-                        }
-
-                        respText = unescape(respText).replaceAll("_n_", "<br/>")
-
-                        var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
-                        // $('#crudCustomersError').html(errMsg);
-                    },
-                });
+                getPrice()
+                $('#barcode').val(null).trigger('change');
             }
-
         })
+
+        function getPrice() {
+            $.ajax({
+                url: '{{ url("administrator/getJsonBarangAdjust") }}',
+                method: "GET",
+                type: 'GET',
+                data: {
+                    'barcode': $("#barcode").val(),
+                },
+                success: function(data) {
+                    var resp = data;
+                    console.log(resp);
+                    console.log($("#barcode").val());
+                    if (data.msg == "ok") {
+                        var params = resp.data[0];
+                        var datas = {
+                            id: params.id,
+                            item_id: params.id,
+                            item_name: params.name_item,
+                            satuan_id: params.unit_id,
+                            satuan: params.unit_code,
+                            kode_item: params.kode_item,
+                            merek: params.merek,
+                            qty: $("#qty").val(),
+                            supplier: $("#supplier").val(),
+                            hpp: parseFloat($("#hpp").val()),
+                            total: parseFloat($("#qty").val()) * parseFloat($("#hpp").val())
+                        }
+                        if (materialExists(params.id)) {
+                            doSuccess('create', 'item sudah masuk list', 'error')
+                        } else {
+                            dataSales.push(datas);
+                        }
+                        let totalBayar = dataSales.reduce((accumulator, currentItem) => accumulator + currentItem.total, 0);
+                        $("#total_bayar").val(totalBayar);
+                        reloadgridItem(dataSales);
+                    } else {
+                        doSuccess('create', resp.data, 'error')
+                    }
+                    $("#qty").val("");
+                    $("#hpp").val("");
+                    // $("#barcode").val("");
+                },
+                error: function(xhr, desc, err) {
+                    var respText = "";
+                    try {
+                        respText = eval(xhr.responseText);
+                    } catch {
+                        respText = xhr.responseText;
+                    }
+
+                    respText = unescape(respText).replaceAll("_n_", "<br/>")
+
+                    var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
+                    // $('#crudCustomersError').html(errMsg);
+                },
+            });
+        }
 
 
 

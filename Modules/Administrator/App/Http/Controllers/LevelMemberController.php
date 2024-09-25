@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\LevelMember;
+use Modules\Administrator\App\Models\Price;
 
 class LevelMemberController extends Controller
 {
@@ -65,9 +66,16 @@ class LevelMemberController extends Controller
 
     public function jsonDelete(Request $req)
     {
-        $resp  = LevelMember::jsonDelete($req);
-        return response()->json(['msg' => $resp]);
+        $material = Price::where('member_id', $req->id);
+        if ($material->count() > 0) {
+            return response()->json(['msg' => 'Level Member Masih Terikat di Harga Aktif,Tidak Bisa di Hapus']);
+        } else {
+            $resp  = LevelMember::jsonDelete($req);
+            return response()->json(['msg' => $resp]);
+        }
     }
+
+
 
     public function jsonForListUnit(Request $request)
     {

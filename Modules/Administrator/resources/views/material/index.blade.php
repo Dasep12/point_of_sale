@@ -256,6 +256,28 @@
         }
     });
 
+    // Export Barcode
+    $("#getSelectedIds").click(function() {
+        var selectedRows = $("#jqGridMain").jqGrid('getGridParam', 'selarrrow');
+        if (selectedRows.length > 0) {
+            console.log(selectedRows);
+            // $.ajax({
+            //     url: "{{ url('administrator/multidelete') }}",
+            //     method: "GET",
+            //     data: {
+            //         "_token": "{{ csrf_token() }}",
+            //         "id": selectedRows
+            //     },
+            //     xhrFields: {
+            //         responseType: 'blob'
+            //     },
+            //     success: function(res) {
+
+            //     }
+            // })
+        }
+    });
+
     $("#jqGridMainPrice").jqGrid({
         url: "{{ url('administrator/jsonMaterialPrice') }}",
         datatype: "json",
@@ -527,7 +549,6 @@
                 break
         }
     }
-
 
 
     $("#parentUnitId").change(function() {

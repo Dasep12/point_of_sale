@@ -9,8 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\LevelMember;
 use Modules\Administrator\App\Models\Adjust;
-
-
+use Modules\Administrator\App\Models\Material;
 
 class AdjustController extends Controller
 {
@@ -30,6 +29,26 @@ class AdjustController extends Controller
     {
         $response = Adjust::jsonList($req);
         return response()->json($response);
+    }
+
+    public function getJsonBarangAdjust(Request $req)
+    {
+        $data = DB::table('tbl_mst_material as a')
+            ->leftJoin('tbl_mst_units as u', 'u.id', '=', 'a.unit_id')
+            ->where(['barcode' => $req->barcode])
+            ->select('a.*', 'u.unit_name', 'u.unit_code');
+        try {
+            if ($data->count() > 0) {
+                $resp = ["msg" => "ok", "data" => $data->get()];
+                return response()->json($resp);
+            } else {
+                $resp = ["msg" => "nok", "data" => "item not found"];
+                return response()->json($resp);
+            }
+        } catch (\Exception $e) {
+            $resp = ["msg" => $e->getMessage(), "data" => $data];
+            return response()->json($resp);
+        }
     }
 
     public function jsonListDetailAdjust(Request $req)
