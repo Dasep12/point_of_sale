@@ -82,23 +82,23 @@
                 label: 'Warehouse',
                 name: 'NameWarehouse',
                 align: 'left',
-                width: 50
+                // width: 50
             }, {
                 label: 'Location',
                 name: 'location',
-                align: 'left',
-                width: 40
+                align: 'center',
+                // width: 40
             }, {
                 label: 'Remarks',
                 name: 'remarks',
-                width: 30,
+                // width: 30,
                 align: 'center',
 
             }, {
                 label: 'Date',
                 name: 'created_at',
                 align: 'center',
-                width: 50,
+                // width: 50,
                 formatter: "date",
                 formatoptions: {
                     srcformat: "ISO8601Long",
@@ -108,7 +108,7 @@
                 label: 'Status',
                 name: 'status_location',
                 align: 'center',
-                width: 35,
+                // width: 35,
                 formatter: function(cellvalue, options, rowObject) {
                     var status = rowObject.status_location == 1 ? 'Active' : 'Inactive';
                     var badge = rowObject.status_location == 1 ? 'badge-success' : 'badge-danger';
@@ -118,7 +118,7 @@
                 label: 'Action',
                 name: 'action',
                 align: 'center',
-                width: 70,
+                // width: 70,
                 formatter: actionBarangFormatter
             }],
             jsonReader: {
@@ -144,8 +144,10 @@
             gridview: true,
             width: 780,
             height: 350,
-            rowNum: 10,
-            rowList: [10, 30, 50],
+            multiselect: true,
+            rowNum: 20,
+            rowList: [20, 50, 100],
+            shrinkToFit: false,
             pager: "#pager",
             loadComplete: function(data) {
                 $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data

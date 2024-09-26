@@ -90,15 +90,20 @@
             }, {
                 label: 'Kode',
                 name: 'code_gudang',
-                align: 'left'
+                align: 'center',
+                width: 60
             }, {
                 label: 'Phone',
                 name: 'phone',
-                align: 'left'
+                align: 'left',
+                align: 'center',
+                width: 90
             }, {
                 label: 'Fax',
                 name: 'fax',
-                align: 'left'
+                align: 'left',
+                align: 'center',
+                width: 90
             }, {
                 label: 'Address',
                 name: 'Address',
@@ -107,6 +112,7 @@
                 label: 'Status ',
                 name: 'status_warehouse',
                 align: 'center',
+                width: 80,
                 formatter: function(cellvalue, options, rowObject) {
                     var status = rowObject.status_warehouse == 1 ? 'Active' : 'Inactive';
                     var badge = rowObject.status_warehouse == 1 ? 'badge-success' : 'badge-danger';
@@ -115,7 +121,7 @@
             }, {
                 label: 'Date',
                 name: 'created_at',
-                align: 'left',
+                align: 'center',
                 formatter: "date",
                 formatoptions: {
                     srcformat: "ISO8601Long",
@@ -151,8 +157,10 @@
             gridview: true,
             width: 780,
             height: 350,
+            multiselect: true,
             rowNum: 20,
-            rowList: [10, 30, 50],
+            rowList: [20, 50, 100],
+            shrinkToFit: false,
             pager: "#pager",
             loadComplete: function(data) {
                 $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data

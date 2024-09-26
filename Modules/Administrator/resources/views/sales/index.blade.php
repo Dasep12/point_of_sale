@@ -160,7 +160,7 @@
             label: 'Struk',
             name: 'total_bayar',
             align: 'center',
-            width: 50,
+            width: 70,
             formatter: function(cellvalue, options, rowObject) {
                 return `<a target="_blank" href='{{ url('administrator/jsonPrintStruck?no_trans=${rowObject.no_transaksi}') }}' class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-file-pdf-o"></i></a>`;
             },
@@ -176,7 +176,7 @@
             label: 'Status',
             name: 'status_bayar',
             align: 'center',
-            width: 50,
+            width: 70,
             formatter: function(cellvalue, options, rowObject) {
                 var status = rowObject.status_bayar;
                 var badge = rowObject.status_bayar == "lunas" ? 'badge-success' : 'badge-danger';
@@ -185,7 +185,7 @@
         }, {
             label: 'Action',
             name: 'id',
-            width: 80,
+            // width: 80,
             align: 'center',
             formatter: actionBarangFormatter
         }],
@@ -204,15 +204,18 @@
                 return obj.records;
             }
         },
+        loadonce: false,
         viewrecords: true,
         rownumbers: true,
         rownumWidth: 30,
         autoresizeOnLoad: true,
         gridview: true,
-        width: '100%',
+        width: 780,
         height: 350,
-        rowNum: 10,
-        rowList: [10, 30, 50],
+        multiselect: false,
+        rowNum: 20,
+        rowList: [20, 50, 100],
+        shrinkToFit: false,
         pager: "#pager",
         subGrid: true,
         subGridRowExpanded: loadDetailMaterial,
@@ -334,7 +337,7 @@
         return btn;
     }
     var modal = document.getElementById("modalCrudSales");
-    var elem = document.documentElement;
+    // var elem = document.documentElement;
 
 
     $('#modalCrudSales').on('shown.bs.modal', function() {
@@ -343,15 +346,20 @@
     });
 
 
-    // Function to open fullscreen mode
+    var elem = document.getElementById("modalCrudSales");
+
     function openFullscreen() {
+        $("#modalCrudSales").css("background", "#f9fbfd");
         if (elem.requestFullscreen) {
             elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            /* Firefox */
+            elem.mozRequestFullScreen();
         } else if (elem.webkitRequestFullscreen) {
-            /* Safari */
+            /* Chrome, Safari & Opera */
             elem.webkitRequestFullscreen();
         } else if (elem.msRequestFullscreen) {
-            /* IE11 */
+            /* IE/Edge */
             elem.msRequestFullscreen();
         }
     }

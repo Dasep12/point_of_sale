@@ -65,115 +65,114 @@
 @include('administrator::pajak.partials.CrudPajak')
 
 <script>
-    $(document).ready(function() {
-        $("#jqGridMain").jqGrid({
-            url: "{{ url('administrator/jsonPajak') }}",
-            datatype: "json",
-            mtype: "GET",
-            postData: {
-                id: "",
-                "_token": "{{ csrf_token() }}",
+    $("#jqGridMain").jqGrid({
+        url: "{{ url('administrator/jsonPajak') }}",
+        datatype: "json",
+        mtype: "GET",
+        postData: {
+            id: "",
+            "_token": "{{ csrf_token() }}",
+        },
+        colModel: [{
+            label: 'ID',
+            name: 'id',
+            key: true,
+            hidden: true,
+        }, {
+            label: 'Name',
+            name: 'name',
+            align: 'left'
+        }, {
+            label: 'Code',
+            name: 'code_pajak',
+            align: 'left'
+        }, {
+            label: 'Persentase',
+            name: 'persentase',
+            align: 'left'
+        }, {
+            label: 'Status ',
+            name: 'status_pajak',
+            align: 'center',
+            formatter: function(cellvalue, options, rowObject) {
+                var status = rowObject.status_pajak == 1 ? 'Active' : 'Inactive';
+                var badge = rowObject.status_pajak == 1 ? 'badge-success' : 'badge-danger';
+                return `<span class="badge ${badge}">${status}</span>`;
             },
-            colModel: [{
-                label: 'ID',
-                name: 'id',
-                key: true,
-                hidden: true,
-            }, {
-                label: 'Name',
-                name: 'name',
-                align: 'left'
-            }, {
-                label: 'Code',
-                name: 'code_pajak',
-                align: 'left'
-            }, {
-                label: 'Persentase',
-                name: 'persentase',
-                align: 'left'
-            }, {
-                label: 'Status ',
-                name: 'status_pajak',
-                align: 'center',
-                formatter: function(cellvalue, options, rowObject) {
-                    var status = rowObject.status_pajak == 1 ? 'Active' : 'Inactive';
-                    var badge = rowObject.status_pajak == 1 ? 'badge-success' : 'badge-danger';
-                    return `<span class="badge ${badge}">${status}</span>`;
-                },
-            }, {
-                label: 'Date',
-                name: 'created_at',
-                align: 'left',
-                formatter: "date",
-                formatoptions: {
-                    srcformat: "ISO8601Long",
-                    newformat: "d M Y H:i:s"
-                }
-            }, {
-                label: 'Action',
-                name: 'action',
-                align: 'center',
-                width: 70,
-                formatter: actionBarangFormatter
-            }],
-            jsonReader: {
-                repeatitems: false,
-                root: function(obj) {
-                    return obj.rows;
-                },
-                page: function(obj) {
-                    return obj.page;
-                },
-                total: function(obj) {
-                    return obj.total;
-                },
-                records: function(obj) {
-                    return obj.records;
-                }
+        }, {
+            label: 'Date',
+            name: 'created_at',
+            align: 'left',
+            formatter: "date",
+            formatoptions: {
+                srcformat: "ISO8601Long",
+                newformat: "d M Y H:i:s"
+            }
+        }, {
+            label: 'Action',
+            name: 'action',
+            align: 'center',
+            // width: 70,
+            formatter: actionBarangFormatter
+        }],
+        jsonReader: {
+            repeatitems: false,
+            root: function(obj) {
+                return obj.rows;
             },
-            loadonce: false,
-            viewrecords: true,
-            rownumbers: true,
-            rownumWidth: 30,
-            autoresizeOnLoad: true,
-            gridview: true,
-            width: '100%',
-            height: 350,
-            rowNum: 20,
-            rowList: [10, 30, 50],
-            pager: "#pager",
-            loadComplete: function(data) {
-                $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
-                if (data.records === 0) {
-                    $("#jqGridMain").parent().append("<div class='d-flex justify-content-center no-data'><h3 class='text-secondary'>data not found</h3></div>");
-                }
-                $(window).on('resize', function() {
-                    var gridWidth = $('#jqGridMain').closest('.ui-jqgrid').parent().width();
-                    $('#jqGridMain').jqGrid('setGridWidth', gridWidth);
-                }).trigger('resize');
+            page: function(obj) {
+                return obj.page;
             },
-        });
+            total: function(obj) {
+                return obj.total;
+            },
+            records: function(obj) {
+                return obj.records;
+            }
+        },
+        loadonce: false,
+        viewrecords: true,
+        rownumbers: true,
+        rownumWidth: 30,
+        autoresizeOnLoad: true,
+        gridview: true,
+        width: 780,
+        height: 350,
+        multiselect: true,
+        rowNum: 20,
+        rowList: [20, 50, 100],
+        shrinkToFit: false,
+        pager: "#pager",
+        loadComplete: function(data) {
+            $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
+            if (data.records === 0) {
+                $("#jqGridMain").parent().append("<div class='d-flex justify-content-center no-data'><h3 class='text-secondary'>data not found</h3></div>");
+            }
+            $(window).on('resize', function() {
+                var gridWidth = $('#jqGridMain').closest('.ui-jqgrid').parent().width();
+                $('#jqGridMain').jqGrid('setGridWidth', gridWidth);
+            }).trigger('resize');
+        },
+    });
 
 
 
-        function actionBarangFormatter(cellvalue, options, rowObject) {
-            var btnid = options.rowId;
-            var btn = "";
-            <?php
-            if (CrudMenuPermission($MenuUrl, $user_id, 'edit')) { ?>
-                btn += `<button data-id="${btnid}" onclick="CrudPajak('update','${btnid}')"  class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
-            <?php } else { ?>
-                btn += `<button disabled class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
-            <?php } ?>
-            <?php if (CrudMenuPermission($MenuUrl, $user_id, 'delete')) { ?>
-                btn += `<button  data-id="${btnid}" onclick="CrudPajak('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
-            <?php } else { ?>
-                btn += `<button disabled class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
-            <?php } ?>
-            return btn;
-        }
-
-    })
+    function actionBarangFormatter(cellvalue, options, rowObject) {
+        var btnid = options.rowId;
+        var btn = "";
+        <?php
+        if (CrudMenuPermission($MenuUrl, $user_id, 'edit')) { ?>
+            btn += `<button data-id="${btnid}" onclick="CrudPajak('update','${btnid}')"  class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
+        <?php } else { ?>
+            btn += `<button disabled class="btn btn-sm text-white btn-option badge-success"><i class="fa fa-pencil"></i></button>`;
+        <?php } ?>
+        <?php if (CrudMenuPermission($MenuUrl, $user_id, 'delete')) { ?>
+            btn += `<button  data-id="${btnid}" onclick="CrudPajak('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
+        <?php } else { ?>
+            btn += `<button disabled class="btn btn-sm text-white btn-option badge-danger"><i class="fa fa-remove"></i></button>`;
+        <?php } ?>
+        return btn;
+    }
 
 
 

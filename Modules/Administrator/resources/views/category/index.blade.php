@@ -86,7 +86,8 @@
             }, {
                 label: 'Code',
                 name: 'code_categories',
-                align: 'left'
+                align: 'center',
+                // width: 70
             }, {
                 label: 'Remarks',
                 name: 'remarks',
@@ -113,7 +114,7 @@
                 label: 'Action',
                 name: 'action',
                 align: 'center',
-                width: 70,
+                // width: 70,
                 formatter: actionBarangFormatter
             }],
             jsonReader: {
@@ -137,10 +138,12 @@
             rownumWidth: 30,
             autoresizeOnLoad: true,
             gridview: true,
-            width: '100%',
+            width: 780,
             height: 350,
+            multiselect: true,
             rowNum: 20,
-            rowList: [10, 30, 50],
+            rowList: [20, 50, 100],
+            shrinkToFit: false,
             pager: "#pager",
             loadComplete: function(data) {
                 $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
