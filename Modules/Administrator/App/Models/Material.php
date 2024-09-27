@@ -2,6 +2,7 @@
 
 namespace Modules\Administrator\App\Models;
 
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
@@ -189,6 +190,7 @@ class Material extends Model
             return $e->getMessage();
         }
     }
+
 
 
     // PRICE

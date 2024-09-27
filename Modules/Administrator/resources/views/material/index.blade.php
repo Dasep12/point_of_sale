@@ -222,6 +222,8 @@
         rowList: [20, 50, 100],
         shrinkToFit: false,
         pager: "#pager",
+        subGrid: true,
+        subGridRowExpanded: loadDetailPrices,
         loadComplete: function(data) {
             // $(this).jqGrid('setGridWidth', $("#jqGridMain").closest(".ui-jqgrid").parent().width());
             $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
@@ -235,6 +237,84 @@
             }).trigger('resize');
         }
     });
+
+    function loadDetailPrices(subgrid_id, row_id) {
+        // Function to load subgrid data
+        var subgrid_table_id = subgrid_id + "_t";
+        $("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table>");
+        $("#" + subgrid_table_id).jqGrid({
+            url: "{{ url('administrator/jsonMaterialPrice') }}",
+            mtype: "GET",
+            datatype: "json",
+            postData: {
+                material_id: row_id,
+                "_token": "{{ csrf_token() }}",
+            },
+            page: 1,
+            colModel: [{
+                label: 'ID',
+                name: 'id',
+                key: true,
+                hidden: true,
+            }, {
+                label: 'LEVEL ID',
+                name: 'member_id',
+                align: 'left',
+                hidden: true
+            }, {
+                label: 'Member',
+                name: 'name_level',
+                align: 'left',
+            }, {
+                label: 'Member',
+                name: 'hrg_jual',
+                align: 'left',
+                formatter: function(value, opt, row) {
+                    return row.harga_jual
+                },
+                hidden: true
+            }, {
+                label: 'Harga Jual',
+                name: 'harga_jual',
+                align: 'center',
+                formatter: 'currency',
+                formatoptions: {
+                    prefix: 'Rp ',
+                    suffix: '',
+                    thousandsSeparator: ','
+                }
+            }, {
+                label: 'Date',
+                name: 'created_at',
+                align: 'left',
+                width: 90,
+                formatter: "date",
+                formatoptions: {
+                    srcformat: "ISO8601Long",
+                    newformat: "d M Y H:i"
+                }
+            }],
+            jsonReader: {
+                repeatitems: false,
+                root: function(obj) {
+                    return obj.rows;
+                },
+                page: function(obj) {
+                    return obj.page;
+                },
+                total: function(obj) {
+                    return obj.total;
+                },
+                records: function(obj) {
+                    return obj.records;
+                }
+            },
+            height: '100%',
+            rowNum: 20,
+            caption: 'Daftar Harga',
+            pager: "#" + subgrid_id + "_p"
+        });
+    }
 
     // Export Barcode
     $("#getSelectedIds").click(function() {

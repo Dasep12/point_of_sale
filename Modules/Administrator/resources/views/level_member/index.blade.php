@@ -101,7 +101,7 @@
                 label: 'Status',
                 name: 'status_level',
                 align: 'center',
-                width: 60,
+                // width: 60,
                 formatter: function(cellvalue, options, rowObject) {
                     var status = rowObject.status_level == 1 ? 'Active' : 'Inactive';
                     var badge = rowObject.status_level == 1 ? 'badge-success' : 'badge-danger';
@@ -135,12 +135,12 @@
             rownumWidth: 30,
             autoresizeOnLoad: true,
             gridview: true,
-            width: 780,
+            width: '100%',
             height: 350,
             multiselect: true,
             rowNum: 20,
             rowList: [20, 50, 100],
-            shrinkToFit: false,
+            shrinkToFit: true,
             pager: "#pager",
             loadComplete: function(data) {
                 $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data
