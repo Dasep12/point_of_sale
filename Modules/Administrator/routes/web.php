@@ -33,6 +33,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDetailUnits', 'UnitsController@jsonDetail');
     Route::post('jsonUpdateUnits', 'UnitsController@jsonUpdate');
     Route::post('jsonDeleteUnits', 'UnitsController@jsonDelete');
+    Route::get('jsonMultiDeleteUnits', 'UnitsController@jsonMultiDelete');
 
 
     // MEMBER ROUTES 
@@ -64,6 +65,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('uploadItemExcel', 'MaterialController@uploadItemExcel');
     Route::get('barcodeGenerate', 'MaterialController@barcodeGenerate');
     Route::get('multidelete', 'MaterialController@jsonmultidelete');
+    Route::get('exportMaterial', 'MaterialController@exportMaterial');
     Route::get('downloadExcelFormatMaterial', 'MaterialController@downloadExcelFormatMaterial');
 
 
@@ -81,6 +83,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDetailWarehouse', 'WarehouseController@jsonDetail');
     Route::post('jsonUpdateWarehouse', 'WarehouseController@jsonUpdate');
     Route::post('jsonDeleteWarehouse', 'WarehouseController@jsonDelete');
+    Route::get('jsonMultiDeleteWarehouse', 'WarehouseController@jsonMultiDelete');
 
     //  CATEGORY  ROUTES
     Route::get('category', 'CategoryController@index');
@@ -89,6 +92,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDetailCategory', 'CategoryController@jsonDetail');
     Route::post('jsonUpdateCategory', 'CategoryController@jsonUpdate');
     Route::post('jsonDeleteCategory', 'CategoryController@jsonDelete');
+    Route::get('jsonMultiDeleteCategory', 'CategoryController@jsonMultiDelete');
 
     //  PAJAK  ROUTES
     Route::get('pajak', 'PajakController@index');
@@ -106,6 +110,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDetailLocation', 'LocationController@jsonDetail');
     Route::post('jsonUpdateLocation', 'LocationController@jsonUpdate');
     Route::post('jsonDeleteLocation', 'LocationController@jsonDelete');
+    Route::get('jsonMultiDeleteLocation', 'LocationController@jsonMultiDelete');
     Route::get('jsonForListLocation', 'LocationController@jsonForListLocation');
 
 

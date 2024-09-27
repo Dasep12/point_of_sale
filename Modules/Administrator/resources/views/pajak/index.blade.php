@@ -141,7 +141,7 @@
         multiselect: true,
         rowNum: 20,
         rowList: [20, 50, 100],
-        shrinkToFit: false,
+        shrinkToFit: true,
         pager: "#pager",
         loadComplete: function(data) {
             $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data

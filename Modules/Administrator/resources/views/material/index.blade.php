@@ -22,8 +22,16 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-inline">
+                            @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
+                            <button type="button" name="tloEnable" onclick="CrudMaterial('create','*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
+
+                            <button type="button" name="tloEnable" onclick="CrudMaterial('upload','uploaditem')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload Item</button>
+
+                            <button type="button" name="tloEnable" onclick="CrudMaterial('upload','uploadharga')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload Price</button>
+                            @endif
                             <!-- Button to Get Selected Row IDs -->
                             <button class="btn btn-sm btn-outline-secondary" id="getSelectedIds"><i class="fa fa-barcode"></i> Export Barcode</button>
+
 
                             <button style="display: none;" class="btn btn-sm btn-outline-danger" id="getSelectedIdxDelete"><i class="fa fa-trash"></i> Delete</button>
                         </div>
@@ -38,16 +46,30 @@
 
                 <hr>
 
-                <div class="form-group">
-                    @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
-                    <button type="button" name="tloEnable" onclick="CrudMaterial('create','*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
 
-                    <button type="button" name="tloEnable" onclick="CrudMaterial('upload','uploaditem')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload Item</button>
+                <div class="dropdown">
+                    <div class="form-group">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="fa fa-external-link"></span> Export
+                        </button>
+                        <form id="form-filter" class="dropdown-menu  p-4 bg-light" style="width:320px">
+                            <h6>Export Product</h6>
+                            <div class="form-group form-group-sm">
+                                <div class="input-group input-group-sm">
+                                    <select class="form-control" id="ExportOption" name="ExportOption">
+                                        <option value="pdf">PDF File</option>
+                                        <option value="xls">Excel File</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" id="exportBtn" class="btn btn-sm btn-dark"><span class="fa fa-file-text-o"></span> Download</button>
+                        </form>
+                        <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
+                    </div>
 
-                    <button type="button" name="tloEnable" onclick="CrudMaterial('upload','uploadharga')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload Price</button>
-                    @endif
-                    <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -287,7 +309,6 @@
                 label: 'Date',
                 name: 'created_at',
                 align: 'left',
-                width: 90,
                 formatter: "date",
                 formatoptions: {
                     srcformat: "ISO8601Long",
@@ -311,6 +332,7 @@
             },
             height: '100%',
             rowNum: 20,
+            width: '50%',
             caption: 'Daftar Harga',
             pager: "#" + subgrid_id + "_p"
         });
@@ -369,7 +391,7 @@
             $("#getSelectedIdxDelete").off('click').on('click', function() {
                 $.confirm({
                     title: 'Perhatian!',
-                    content: 'Delete Material ?',
+                    content: 'Delete Product ?',
                     buttons: {
                         yes: {
                             btnClass: 'btn-danger',
@@ -386,7 +408,7 @@
                                             ReloadBarang();
                                             doSuccess('delete', 'success delete data', 'success')
                                         } else {
-                                            alert(res.msg)
+                                            doSuccess('delete', res.msg, 'error')
                                         }
                                     },
                                     error: function(xhr, desc, err) {
@@ -400,7 +422,7 @@
                                         respText = unescape(respText).replaceAll("_n_", "<br/>")
 
                                         var errMsg = ' Error ' + xhr.status + '!</b><br/>' + respText + '</small>'
-                                        alert(errMsg);
+                                        doSuccess('delete', errMsg, 'error')
                                     },
                                 })
                             }
@@ -619,6 +641,7 @@
         } else if (action == "upload") {
             document.getElementById("formUploadItem").reset();
             $('#modalUploadItem').modal('show');
+
             $('#UploadItemError').html("");
             $(".form-control").removeClass("parsley-error");
             $(".parsley-required").html("");
@@ -627,13 +650,60 @@
             if (idx == "uploaditem") {
                 // $('#format_upload').attr('href', '{{ asset("document/format_upload_material.xlsx") }}');
                 $('#format_upload').attr('href', '{{ url("administrator/downloadExcelFormatMaterial?file=format_upload_material.xls") }}');
+                $(".modal-title").html('Form Upload Material')
             } else if (idx == "uploadharga") {
                 // $('#format_upload').attr('href', '{{ asset("document/format_upload_harga.xlsx") }}');
                 $('#format_upload').attr('href', '{{ url("administrator/downloadExcelFormatMaterial?file=format_upload_harga.xls") }}');
+                $(".modal-title").html('Form Upload Harga')
             }
         }
     }
 
+    function Exports() {
+        var url = "";
+        url = "{{ url('administrator/exportMaterial') }}"
+        $.ajax({
+            url: url,
+            method: "GET",
+            data: {
+                act: $("#ExportOption").val()
+            },
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function(data, status, xhr) {
+
+                if ($("#ExportOption").val() == "xls") {
+                    // Create a URL for the Blob object and initiate download
+                    var blob = new Blob([data], {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "Product.xlsx";
+                    link.click();
+                } else if ($("#ExportOption").val() == "pdf") {
+                    var blob = new Blob([data], {
+                        type: 'application/pdf'
+                    });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "Product.pdf";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+
+            },
+            error: function(xhr, status, error) {
+                console.error('Error exporting file:', error);
+            }
+        })
+    }
+
+    $("#exportBtn").click(function() {
+        Exports()
+    })
 
 
     function CrudPrice(action, idx) {

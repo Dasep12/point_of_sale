@@ -67,7 +67,6 @@
                     processData: false,
                     data: formData,
                     success: function(data) {
-                        console.log(data)
                         if (data.success) {
                             $('#modalUploadItem').modal('hide');
                             ReloadBarang();
@@ -84,6 +83,7 @@
                         } catch {
                             respText = xhr.responseText;
                         }
+                        console.log(xhr);
 
                         respText = unescape(respText).replaceAll("_n_", "<br/>")
 

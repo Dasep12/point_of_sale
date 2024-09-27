@@ -14,7 +14,13 @@ use Modules\Administrator\App\Models\Units;
 use Modules\Administrator\App\Models\Warehouse;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PDF;
-use Svg\Tag\Rect;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 
 class MaterialController extends Controller
 {
@@ -102,10 +108,16 @@ class MaterialController extends Controller
     {
         DB::beginTransaction();
         try {
-            DB::table('tbl_mst_harga')->whereIn('material_id', $req->id)->delete();
-            DB::table('tbl_mst_material')->whereIn('id', $req->id)->delete();
-            DB::commit();
-            return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+            $sales = DB::table('tbl_trn_detail_sales')->whereIn('item_id', $req->id);
+            $beli = DB::table('tbl_trn_detail_beli')->whereIn('item_id', $req->id);
+            if ($sales->count() > 0 || $beli->count() > 0) {
+                return response()->json(['msg' => 'Produk Sudah Ada di Transaksi,Tidak Bisa di Hapus']);
+            } else {
+                DB::table('tbl_mst_harga')->whereIn('material_id', $req->id)->delete();
+                DB::table('tbl_mst_material')->whereIn('id', $req->id)->delete();
+                DB::commit();
+                return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+            }
         } catch (Exception $e) {
             DB::rollback();
             return response()->json(['success' => false, 'msg' => $e->getMessage()]);
@@ -151,11 +163,27 @@ class MaterialController extends Controller
                 $code_gudang = $sheet->getCell('O' . $i)->getValue();
                 $remarks = $sheet->getCell('P' . $i)->getValue();
 
+
+                if ($harga_pokok == null || $harga_pokok == "") {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Column Harga Pokok Empty'
+                    ]);
+                }
+
                 $cekKategori = Category::where('code_categories', $jenis_item);
                 if ($cekKategori->count() <= 0) {
                     return response()->json([
                         'success' => false,
-                        'msg' => 'Jenis Item ' . $jenis_item  . ' not found'
+                        'msg' => 'Kategori Item ' . $jenis_item  . ' not found'
+                    ]);
+                }
+
+                $kodeItem = Material::where('kode_item', $kode_item);
+                if ($kodeItem->count() > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Kode Item ' . $kode_item  . ' exist '
                     ]);
                 }
 
@@ -163,7 +191,7 @@ class MaterialController extends Controller
                 if ($cekSatuan->count() <= 0) {
                     return response()->json([
                         'success' => false,
-                        'msg' => 'Jenis Item ' . $satuan  . ' not found'
+                        'msg' => 'Unit  ' . $satuan  . ' not found'
                     ]);
                 }
 
@@ -227,6 +255,137 @@ class MaterialController extends Controller
                 'success' => false,
                 'message' => 'Error loading file: ' . $e->getMessage(),
             ]);
+        }
+    }
+
+
+    public function exportMaterial(Request $req)
+    {
+        $sql = "SELECT a.* , b.unit_code , f.location , d.code_categories , e.NameWarehouse
+                FROM tbl_mst_material a 
+                left join tbl_mst_units b on b.id = a.unit_id 
+                left join tbl_mst_rak f on f.id = a.location_id
+                left join tbl_mst_categories d on d.id = a.categori_id
+                left join tbl_mst_warehouse e on e.id = a.warehouse_id ";
+
+        $data = DB::select($sql);
+        // Create a new Spreadsheet object
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        // Set some data in the spreadsheet
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Item');
+        $sheet->setCellValue('C1', 'Barcode');
+        $sheet->setCellValue('D1', 'Nama Item');
+        $sheet->setCellValue('E1', 'Kategori');
+        $sheet->setCellValue('F1', 'Unit');
+        $sheet->setCellValue('G1', 'Merek');
+        $sheet->setCellValue('H1', 'Satuan Dasar');
+        $sheet->setCellValue('I1', 'Konversi Satuan Dasar');
+        $sheet->setCellValue('J1', 'Harga Pokok');
+        $sheet->setCellValue('K1', 'Stock Minimum');
+        $sheet->setCellValue('L1', 'Tipe Item');
+        $sheet->setCellValue('M1', 'Menggunakan Serial');
+        $sheet->setCellValue('N1', 'Rak');
+        $sheet->setCellValue('O1', 'Kode Gudang');
+        $sheet->setCellValue('P1', 'Keterangan');
+
+        // Apply borders to a single cell
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+                'inside' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+        // Set background color for a range of cells
+        $sheet->getStyle('A1:P1')->applyFromArray([
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'f8fc03'], // Magenta background
+            ],
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
+
+        // Example: Freeze the first row
+        $sheet->freezePane('A2');
+        // Auto size columns based on the content
+        $this->autoSizeColumns($sheet, range('A', 'P'));
+
+        $start = 2;
+        $no = 1;
+
+        if (count($data) > 0) {
+            foreach ($data as $d) {
+                $sheet->setCellValue('A' . $start, $no++);
+                $sheet->setCellValue('B' . $start, $d->kode_item);
+                $sheet->setCellValue('C' . $start, $d->barcode);
+                $sheet->setCellValue('D' . $start, ucwords(strtoupper($d->name_item)));
+                $sheet->setCellValue('E' . $start, ucwords(strtoupper($d->code_categories)));
+                $sheet->setCellValue('F' . $start, ucwords(strtoupper($d->unit_code)));
+                $sheet->setCellValue('G' . $start, ucwords(strtoupper($d->merek)));
+                $sheet->setCellValue('H' . $start, ucwords(strtoupper($d->satuan_dasar)));
+                $sheet->setCellValue('I' . $start, ucwords(strtoupper($d->konversi_satuan)));
+                $sheet->setCellValue('J' . $start, ucwords(strtoupper($d->harga_pokok)));
+                $sheet->setCellValue('K' . $start, ucwords(strtoupper($d->stock_minimum)));
+                $sheet->setCellValue('L' . $start, ucwords(strtoupper($d->tipe_item)));
+                $sheet->setCellValue('M' . $start, ucwords(strtoupper($d->serial)));
+                $sheet->setCellValue('N' . $start, ucwords(strtoupper($d->location)));
+                $sheet->setCellValue('O' . $start, ucwords(strtoupper($d->NameWarehouse)));
+                $sheet->setCellValue('P' . $start, ucwords(strtoupper($d->remarks)));
+                $start++;
+            }
+        } else {
+            $sheet->setCellValue('A' . $start, "data not found");
+            $sheet->mergeCells('A' . $start . ':P' . $start + 1);
+        }
+
+        $sheet->getStyle('A1:P' . $start)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:P' . $start)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A1:P' . $start - 1)->applyFromArray($styleArray);
+        $sheet->getStyle('A1:P' . $start)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+
+        if ($req->act == "xls") {
+            // Save the spreadsheet to a file
+            $writer = new Xlsx($spreadsheet);
+            $tempFile = tempnam(sys_get_temp_dir(), 'php');
+            $writer->save($tempFile);
+
+            // Return the file as a response
+            return response()->download($tempFile, 'export.xlsx')->deleteFileAfterSend(true);
+        } else if ($req->act == "pdf") {
+            // Write the file to a stream
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf($spreadsheet);
+            $writer = new Mpdf($spreadsheet);
+
+            // Return the file as a response
+            return response()->stream(
+                function () use ($writer) {
+                    $writer->save('php://output');
+                },
+                200,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="export.pdf"',
+                ]
+            );
+        }
+    }
+
+    private function autoSizeColumns($sheet, array $columns)
+    {
+        foreach ($columns as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
     }
 
@@ -303,6 +462,14 @@ class MaterialController extends Controller
                     return response()->json([
                         'success' => false,
                         'msg' => 'Item ' . $name_item  . ' not found'
+                    ]);
+                }
+
+                $cekHarga = Price::where(['member_id' => $cekMember->first()->id, 'material_id' => $cekMaterial->first()->id]);
+                if ($cekHarga->count() > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Harga  ' . $name_item . ' ' . $cekMember->first()->name_level . ' sudah ada di database'
                     ]);
                 }
 

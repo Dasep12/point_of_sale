@@ -80,6 +80,24 @@ class UnitsController extends Controller
         }
     }
 
+    public function jsonMultiDelete(Request $req)
+    {
+        DB::beginTransaction();
+        try {
+            $Material = Material::whereIn('unit_id', $req->id);
+            if ($Material->count() > 0) {
+                return response()->json(['msg' => 'Unit Masih Terikat di Product Aktif,Tidak Bisa di Hapus']);
+            } else {
+                Units::whereIn('id', $req->id)->delete();
+                DB::commit();
+                return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+        }
+    }
+
     public function jsonForListUnit(Request $request)
     {
         $parent = $request->get('parent');

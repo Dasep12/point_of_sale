@@ -215,7 +215,7 @@
         multiselect: false,
         rowNum: 20,
         rowList: [20, 50, 100],
-        shrinkToFit: false,
+        shrinkToFit: true,
         pager: "#pager",
         subGrid: true,
         subGridRowExpanded: loadDetailMaterial,
@@ -337,7 +337,7 @@
         return btn;
     }
     var modal = document.getElementById("modalCrudSales");
-    // var elem = document.documentElement;
+    var elem = document.documentElement;
 
 
     $('#modalCrudSales').on('shown.bs.modal', function() {
@@ -346,10 +346,10 @@
     });
 
 
-    var elem = document.getElementById("modalCrudSales");
+    // var elem = document.getElementById("modalCrudSales");
 
     function openFullscreen() {
-        $("#modalCrudSales").css("background", "#f9fbfd");
+        // $("#modalCrudSales").css("background", "#f9fbfd");
         if (elem.requestFullscreen) {
             elem.requestFullscreen();
         } else if (elem.mozRequestFullScreen) {

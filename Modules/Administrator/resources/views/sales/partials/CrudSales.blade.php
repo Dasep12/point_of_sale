@@ -302,7 +302,8 @@
             const myNotification = window.createNotification({
                 // options here
                 displayCloseButton: true,
-                theme: theme //success error , information , success
+                theme: theme, //success error , information , success
+                zIndex: 1040
             });
 
             myNotification({
@@ -310,6 +311,7 @@
                 message: msg
             });
         }
+
         var qtys = document.getElementById("qty");
 
         qtys.addEventListener('keydown', function(event) {

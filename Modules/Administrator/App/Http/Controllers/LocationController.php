@@ -81,6 +81,24 @@ class LocationController extends Controller
         }
     }
 
+    public function jsonMultiDelete(Request $req)
+    {
+        DB::beginTransaction();
+        try {
+            $Material = Material::whereIn('location_id', $req->id);
+            if ($Material->count() > 0) {
+                return response()->json(['msg' => 'Location Masih Terikat di Product Aktif,Tidak Bisa di Hapus']);
+            } else {
+                Location::whereIn('id', $req->id)->delete();
+                DB::commit();
+                return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+        }
+    }
+
     public function jsonForListLocation(Request $request)
     {
         $id = $request->get('id');
