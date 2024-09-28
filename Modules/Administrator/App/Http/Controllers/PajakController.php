@@ -70,6 +70,19 @@ class PajakController extends Controller
         return response()->json(['msg' => $resp]);
     }
 
+    public function jsonMultiDelete(Request $req)
+    {
+        DB::beginTransaction();
+        try {
+            Pajak::whereIn('id', $req->id)->delete();
+            DB::commit();
+            return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+        }
+    }
+
     public function jsonForListPajak(Request $request)
     {
         $query = $request->get('q');

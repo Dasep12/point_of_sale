@@ -17,7 +17,8 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-
+                <!-- Button to Get Selected Row IDs -->
+                <button style="display: none;" class="btn btn-sm btn-outline-danger" id="getSelectedIdxDelete"><i class="fa fa-trash"></i> Delete</button>
                 <table id="jqGridMain"></table>
                 <div id="pager"></div>
 
@@ -171,6 +172,64 @@
             <?php } ?>
             return btn;
         }
+
+        // Delete Multiple
+        $('#jqGridMain').on('jqGridSelectRow jqGridSelectAll', function() {
+            var selectedRows = $("#jqGridMain").jqGrid('getGridParam', 'selarrrow');
+            if (selectedRows.length > 0) {
+                document.getElementById("getSelectedIdxDelete").style.display = "block";
+
+                $("#getSelectedIdxDelete").off('click').on('click', function() {
+                    $.confirm({
+                        title: 'Perhatian!',
+                        content: 'Delete Product ?',
+                        buttons: {
+                            yes: {
+                                btnClass: 'btn-danger',
+                                action: function() {
+                                    $.ajax({
+                                        url: "{{ url('administrator/jsonMultiDeleteLevelMember') }}",
+                                        method: "GET",
+                                        data: {
+                                            "_token": "{{ csrf_token() }}",
+                                            "id": selectedRows
+                                        },
+                                        success: function(res) {
+                                            if (res.success) {
+                                                ReloadBarang();
+                                                doSuccess('delete', 'success delete data', 'success')
+                                            } else {
+                                                doSuccess('delete', res.msg, 'error')
+                                            }
+                                        },
+                                        error: function(xhr, desc, err) {
+                                            var respText = "";
+                                            try {
+                                                respText = eval(xhr.responseText);
+                                            } catch {
+                                                respText = xhr.responseText;
+                                            }
+
+                                            respText = unescape(respText).replaceAll("_n_", "<br/>")
+
+                                            var errMsg = ' Error ' + xhr.status + '!</b><br/>' + respText + '</small>'
+                                            doSuccess('delete', errMsg, 'error')
+                                        },
+                                    })
+                                }
+                            },
+                            no: {
+                                btnClass: 'btn-blue',
+                                action: function() {}
+                            },
+                        }
+                    });
+                })
+
+            } else {
+                document.getElementById("getSelectedIdxDelete").style.display = "none";
+            }
+        });
 
 
     })

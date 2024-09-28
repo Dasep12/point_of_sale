@@ -51,6 +51,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDetailLevelMember', 'LevelMemberController@jsonDetail');
     Route::post('jsonUpdateLevelMember', 'LevelMemberController@jsonUpdate');
     Route::post('jsonDeleteLevelMember', 'LevelMemberController@jsonDelete');
+    Route::get('jsonMultiDeleteLevelMember', 'LevelMemberController@jsonMultiDelete');
 
 
 
@@ -101,6 +102,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonDetailPajak', 'PajakController@jsonDetail');
     Route::post('jsonUpdatePajak', 'PajakController@jsonUpdate');
     Route::post('jsonDeletePajak', 'PajakController@jsonDelete');
+    Route::get('jsonMultiDeletePajak', 'PajakController@jsonMultiDelete');
 
 
     // LOCATION ROUTES 
@@ -179,6 +181,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::get('jsonListItemReporting', 'ReportingController@jsonListItemReporting');
     Route::get('exportReportSales', 'ReportingController@exportReportSales');
     Route::get('exportReportBeli', 'ReportingController@exportReportBeli');
+    Route::get('getJsonMaterialReporting', 'ReportingController@getJsonMaterialReporting');
 
 
 

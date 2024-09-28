@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
                     </div>
                 </div>
                 <div class="clearfix"></div>
+
             </div>
             <div class="x_content">
                 <div class="d-flex justify-content-center">
@@ -30,18 +31,18 @@ use Illuminate\Support\Facades\DB;
 
                             <div class="input-group input-group-sm">
                                 <select id="material_id" name="material_id" style="font-size: 0.75rem !important;" class="form-control form-control-sm custom-select select2">
-                                    <option value="*">*All Material</option>
+                                    <!-- <option value="*">*All Material</option> -->
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group form-group-sm">
                             <div class="input-group input-group-sm">
-                                <input id="startdateFilter" type="date" class="form-control input-daterange" placeholder="Start Date">
+                                <input id="startdateFilter" type="text" class="form-control input-daterange" placeholder="Start Date">
                                 <div class="input-group-append">
                                     <span class="input-group-text">To</span>
                                 </div>
-                                <input id="enddateFilter" type="date" class="form-control date" placeholder="End Date">
+                                <input id="enddateFilter" type="text" class="form-control date" placeholder="End Date">
                             </div>
                         </div>
                         <div class="form-group form-group-sm">
@@ -69,36 +70,95 @@ use Illuminate\Support\Facades\DB;
 
 
         // Fetch Customers
-        function GetlistMaterial(cust_id) {
-            $.ajax({
-                url: '{{ url("administrator/jsonListItemReporting") }}',
-                data: {
-                    customer_id: cust_id
-                },
-                success: function(data) {
-                    var $select = $('#material_id');
-                    $select.empty();
-                    var sessCustomers = "{{ session()->get('customers_id') }}";
-                    if (sessCustomers == "*") {
-                        $select.append('<option value="*">*All Material</option>');
-                    } else {
-                        $select.append(`<option value="*">*All Material</option>`);
-                    }
-                    $.each(data, function(index, option) {
-                        if (option.id == sessCustomers) {
-                            // Stop the loop when the value is the same as targetValue
-                            $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
-                            return false;
-                        } else {
-                            $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
-                        }
+        // function GetlistMaterial(cust_id) {
+        //     $.ajax({
+        //         url: '{{ url("administrator/jsonListItemReporting") }}',
+        //         data: {
+        //             customer_id: cust_id
+        //         },
+        //         success: function(data) {
+        //             var $select = $('#material_id');
+        //             $select.empty();
+        //             var sessCustomers = "{{ session()->get('customers_id') }}";
+        //             if (sessCustomers == "*") {
+        //                 $select.append('<option value="*">*All Material</option>');
+        //             } else {
+        //                 $select.append(`<option value="*">*All Material</option>`);
+        //             }
+        //             $.each(data, function(index, option) {
+        //                 if (option.id == sessCustomers) {
+        //                     // Stop the loop when the value is the same as targetValue
+        //                     $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
+        //                     return false;
+        //                 } else {
+        //                     $select.append('<option  value="' + option.id + '">' + option.name_item + '</option>');
+        //                 }
 
-                    });
-                }
-            });
+        //             });
+        //         }
+        //     });
+        // }
+
+        // GetlistMaterial("");
+        function formatResult(repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+            return '' + repo.text + '';
         }
 
-        GetlistMaterial("");
+        function formatSelection(repo) {
+            return repo.text || repo.id;
+        }
+        $("#material_id").select2({
+            // matcher: matchStart,
+            placeholder: "Select a state",
+            allowClear: true,
+            ajax: {
+                url: "{{ url('administrator/getJsonMaterialReporting') }}", // Your server endpoint that returns the data
+                dataType: 'json', // The data type expected from the server
+                delay: 250, // Delay in ms before the request is sent
+                data: function(params) {
+                    return {
+                        search: params.term, // Search term (what the user types)
+                        page: params.page || 1 // Pagination (optional)
+                    };
+                },
+                processResults: function(data, params) {
+                    // Parse the results into the format expected by Select2
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items, // The array of results from the server
+                        pagination: {
+                            more: data.pagination.more // Indicates if there are more pages to load
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search Barcode', // Placeholder text
+            minimumInputLength: 1, // Minimum number of characters before search begins
+            templateResult: formatResult, // Optional function to customize how results are displayed
+            templateSelection: formatSelection
+        });
+
+        // Set default value (replace 'DEFAULT_VALUE' with the actual value)
+        var defaultId = '*'; // Default ID you want to select
+        var defaultText = 'All Product'; // Default text you want to display
+
+        // Create a new option and set it as selected
+        var defaultOption = new Option(defaultText, defaultId, true, true);
+        $("#material_id").append(defaultOption).trigger('change');
+
+        // Event listener for when the clear button is used
+        $("#material_id").on('select2:clear', function(e) {
+            // Set the default option when cleared
+            var defaultOption = new Option(defaultText, defaultId, true, true);
+            $(this).append(defaultOption).trigger('change');
+        });
+
+
 
         function Exports() {
             var url = "";
@@ -124,7 +184,7 @@ use Illuminate\Support\Facades\DB;
                         });
                         var link = document.createElement('a');
                         link.href = window.URL.createObjectURL(blob);
-                        link.download = "Summary_" + $("#startdateFilter").val() + '_' + $("#enddateFilter").val() + '.xlsx';
+                        link.download = "Report_" + $("#startdateFilter").val() + '_' + $("#enddateFilter").val() + '.xlsx';
                         link.click();
                     } else if ($("#ExportOption").val() == "pdf") {
                         var blob = new Blob([data], {
@@ -132,7 +192,7 @@ use Illuminate\Support\Facades\DB;
                         });
                         var link = document.createElement('a');
                         link.href = window.URL.createObjectURL(blob);
-                        link.download = "Summary_" + $("#startdateFilter").val() + '_' + $("#enddateFilter").val() + '.pdf';
+                        link.download = "Report_" + $("#startdateFilter").val() + '_' + $("#enddateFilter").val() + '.pdf';
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
@@ -149,6 +209,19 @@ use Illuminate\Support\Facades\DB;
             Exports()
         })
 
+
+        $("#startdateFilter").daterangepicker({
+            singleDatePicker: !0,
+            singleClasses: "picker_2"
+        }, function(e, a, t) {
+            console.log(e.toISOString(), a.toISOString(), t)
+        })
+        $("#enddateFilter").daterangepicker({
+            singleDatePicker: !0,
+            singleClasses: "picker_2"
+        }, function(e, a, t) {
+            console.log(e.toISOString(), a.toISOString(), t)
+        })
 
     })
 </script>

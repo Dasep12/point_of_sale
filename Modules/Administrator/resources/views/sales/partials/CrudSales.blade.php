@@ -41,6 +41,16 @@
                             </div>
                         </div>
                         <div class="col-md-7 col-sm-12  form-group">
+
+                            <div class="item form-group">
+                                <label class="col-md-2 col-sm-3" for="first-name">Barcode <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8 col-sm-6 ">
+                                    <select style="width: 100%;" name="barcode" placeholder="Scan Barcode Here" class="select2 js-example-matcher-start" id="barcode">
+                                    </select>
+                                    <div id="suggestions"></div>
+                                </div>
+                            </div>
                             <div class="item form-group">
                                 <label class="col-md-2 col-sm-3" for="qty">Qty <span class="required">*</span>
                                 </label>
@@ -53,18 +63,6 @@
                                 </label>
                                 <div class="col-md-8 col-sm-6 ">
                                     <input autocomplete="off" value="0" type="text" autofocus id="discount" class="form-control form-control-sm">
-                                </div>
-                            </div>
-                            <div class="item form-group">
-                                <label class="col-md-2 col-sm-3" for="first-name">Barcode <span class="required">*</span>
-                                </label>
-                                <div class="col-md-8 col-sm-6 ">
-                                    <!-- <input type="text" autocomplete="off" name="barcode" placeholder="Scan Item Disini" rows="4" required class="form-control form-control-lg" id="barcode" />
-                                     -->
-
-                                    <select style="width: 100%;" name="barcode" placeholder="Scan Barcode Here" class="select2 js-example-matcher-start" id="barcode">
-                                    </select>
-                                    <div id="suggestions"></div>
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -256,8 +254,10 @@
                 e.preventDefault(); // Prevent the default behavior
                 var selectedValue = $('#barcode').val();
                 if (selectedValue) {
-                    getPrice()
-                    $('#barcode').val(null).trigger('change');
+                    // getPrice()
+                    // $('#barcode').val(null).trigger('change');
+                    var qty = document.getElementById("qty");
+                    qty.focus();
                 }
             }
         });
@@ -396,6 +396,7 @@
                 var qty = document.getElementById("qty");
                 qty.focus();
                 getPrice()
+                // $('#barcode').val(null).trigger('change');
             }
         })
 
@@ -406,7 +407,8 @@
                 type: 'GET',
                 data: {
                     'barcode': $("#barcode").val(),
-                    'member_id': $("#member_id").val()
+                    'member_id': $("#member_id").val(),
+                    'qty': $("#qty").val()
                 },
                 success: function(data) {
                     var resp = data;
@@ -435,7 +437,6 @@
                         }
                         reloadgridItem(dataSales);
                         countPrice();
-
                     } else {
                         doSuccess('create', resp.data, 'error')
                     }
@@ -446,8 +447,9 @@
                     $("#kembalian").val("");
                     $("#kembalian_pref").val("");
                     $("#discount").val(0);
-                    document.getElementById("suggestions").style.display = "none";
-                    $("#qty").focus();
+                    // document.getElementById("suggestions").style.display = "none";
+                    // $("#qty").focus();
+                    $('#barcode').select2('open');
                 },
                 error: function(xhr, desc, err) {
                     var respText = "";
@@ -459,6 +461,7 @@
                     respText = unescape(respText).replaceAll("_n_", "<br/>")
                     var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
                     // $('#crudCustomersError').html(errMsg);
+                    alert(errMsg)
                 },
             });
         }
@@ -547,7 +550,7 @@
                             $("#btnPrintStruk").attr("disabled", false);
                             $("#btnCancel").attr("disabled", false);
                             $("#btnReset").attr("disabled", false);
-                            doSuccess('create', 'Data Save To Record', 'success')
+                            doSuccess('create', 'Pembayaran Berhasil', 'success')
                         } else {
                             $("#btnPrintStruk").attr("disabled", true);
                             $("#btnCancel").attr("disabled", true);

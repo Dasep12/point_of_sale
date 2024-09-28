@@ -39,16 +39,18 @@ class ReportingController extends Controller
 
     public function exportReportSales(Request $req)
     {
+        $startDate = date('Y-m-d', strtotime($req->startDate));
+        $endDate = date('Y-m-d', strtotime($req->endDate));
         $sql = "SELECT a.*  , b.* from tbl_trn_detail_sales a
         left join tbl_trn_header_trans b on b.id  = a.header_id 
         WHERE b.type in ('out') and  b.types in ('sales') and 
         date_format(b.date_trans,'%Y-%m-%d') 
-        between '$req->startDate' AND '$req->endDate' ";
+        between '$startDate' AND '$endDate' ";
 
 
 
         if ($req->material_id != "*") {
-            $sql .= " AND a.material_id='" . $req->material_id . "'";
+            $sql .= " AND a.item_id='" . $req->material_id . "'";
         }
         $data = DB::select($sql);
         // Create a new Spreadsheet object
@@ -94,6 +96,8 @@ class ReportingController extends Controller
         $sheet->mergeCells('G5:J5');
         $sheet->setCellValue('K5', 'Total');
         $sheet->mergeCells('K5:K6');
+        $sheet->setCellValue('L5', 'Paid');
+        $sheet->mergeCells('L5:L6');
 
         // Apply borders to a single cell
         $styleArray = [
@@ -109,7 +113,7 @@ class ReportingController extends Controller
             ],
         ];
         // Set background color for a range of cells
-        $sheet->getStyle('A5:K6')->applyFromArray([
+        $sheet->getStyle('A5:L6')->applyFromArray([
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['argb' => 'f8fc03'], // Magenta background
@@ -122,11 +126,13 @@ class ReportingController extends Controller
         // Example: Freeze the first row
         $sheet->freezePane('E3');
         // Auto size columns based on the content
-        $this->autoSizeColumns($sheet, range('A', 'K'));
+        $this->autoSizeColumns($sheet, range('A', 'L'));
 
         $start = 7;
         $no = 1;
-
+        $grd = 0;
+        $uangBayar = 0;
+        $qtyTotal = 0;
         if (count($data) > 0) {
             foreach ($data as $d) {
                 $sheet->setCellValue('A' . $start, $no++);
@@ -140,17 +146,29 @@ class ReportingController extends Controller
                 $sheet->setCellValue('I' . $start, number_format($d->harga_jual));
                 $sheet->setCellValue('J' . $start, number_format($d->discount));
                 $sheet->setCellValue('K' . $start, number_format(($d->harga_jual * $d->out_stock) - $d->discount));
+                $sheet->setCellValue('L' . $start, number_format(($d->harga_jual * $d->out_stock) - $d->discount));
                 $start++;
+
+                $grd += ($d->harga_jual * $d->out_stock) - $d->discount;
+                $uangBayar += ($d->harga_jual * $d->out_stock) - $d->discount;
+                $qtyTotal += $d->out_stock;
             }
+
+            $sheet->setCellValue('A' . $start, 'Grand Total');
+            $sheet->mergeCells('A' . $start . ':G' . $start);
+            $sheet->setCellValue('H' . $start, number_format($qtyTotal));
+            $sheet->setCellValue('K' . $start, number_format($grd));
+            $sheet->setCellValue('L' . $start, number_format($uangBayar));
+            $sheet->mergeCells('I' . $start . ':J' . $start);
         } else {
             $sheet->setCellValue('A' . $start, "data not found");
             $sheet->mergeCells('A' . $start . ':K' . $start + 1);
         }
 
-        $sheet->getStyle('A5:K' . $start)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A5:K' . $start)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet->getStyle('A5:K' . $start - 1)->applyFromArray($styleArray);
-        $sheet->getStyle('A5:K' . $start)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A5:L' . $start)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A5:L' . $start)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A5:L' . $start)->applyFromArray($styleArray);
+        $sheet->getStyle('A5:L' . $start)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 
         if ($req->act == "xls") {
@@ -191,7 +209,7 @@ class ReportingController extends Controller
 
 
         if ($req->material_id != "*") {
-            $sql .= " AND a.material_id='" . $req->material_id . "'";
+            $sql .= " AND a.item_id='" . $req->material_id . "'";
         }
         $data = DB::select($sql);
         // Create a new Spreadsheet object
@@ -466,4 +484,35 @@ class ReportingController extends Controller
     }
 
     public function jsonExportPdf(Request $req) {}
+
+    public function getJsonMaterialReporting(Request $req)
+    {
+        $search = $req->input('search');
+
+
+        $results = [];
+        $results[] = [
+            'id'  => '*',
+            'text' => 'All Product'
+        ];
+        $material = Material::where('barcode', 'like', '%' . $search . '%')
+            ->orWhere('name_item', 'like', '%' . $search . '%')
+            ->paginate(10); // Paginate results
+
+        foreach ($material as $supplier) {
+            $results[] = [
+                'id' => $supplier->id,
+                'text' => $supplier->name_item . ' - ' . $supplier->barcode,
+            ];
+        }
+        $results[] = [
+            'id'  => '*',
+            'text' => 'All Product'
+        ];
+
+        return response()->json([
+            'items' => $results,
+            'pagination' => ['more' => $material->hasMorePages()]
+        ]);
+    }
 }

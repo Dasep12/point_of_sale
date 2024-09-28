@@ -341,7 +341,8 @@
 
 
     $('#modalCrudSales').on('shown.bs.modal', function() {
-        $('#qty').trigger('focus');
+        // $('#qty').trigger('focus');
+        $('#barcode').select2('open');
         $("#jqGridSalesList").jqGrid('setGridWidth', $(".modal-dialog").width() * 0.98); //
     });
 

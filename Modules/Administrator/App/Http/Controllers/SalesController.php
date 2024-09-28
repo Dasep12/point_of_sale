@@ -52,11 +52,18 @@ class SalesController extends Controller
 
     public function getJsonPrice(Request $req)
     {
+        $data = DB::table('vw_master_price')
+            ->where(['barcode' => $req->barcode, 'member_id' => $req->member_id])
+            ->select('*');
         try {
-            $sql = "SELECT * FROM vw_master_price WHERE barcode = '$req->barcode' AND member_id ='$req->member_id' ";
-            $data = DB::table('vw_master_price')
-                ->where(['barcode' => $req->barcode, 'member_id' => $req->member_id])
-                ->select('*');
+
+            $cekStock = DB::table('vw_stock_item')->where('barcode', $req->barcode)->get()->first();
+
+            if ($cekStock->Stock < (float)$req->qty) {
+                $resp = ["msg" => "nok", "data" => "Pembelian Melebihi Stock Yang Ada, Silahkan Adjust Stock Product Dahulu"];
+                return response()->json($resp);
+            }
+
 
             if ($data->count() > 0) {
                 $resp = ["msg" => "ok", "data" => $data->get()];

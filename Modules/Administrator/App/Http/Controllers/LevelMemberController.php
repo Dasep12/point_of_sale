@@ -75,6 +75,24 @@ class LevelMemberController extends Controller
         }
     }
 
+    public function jsonMultiDelete(Request $req)
+    {
+        DB::beginTransaction();
+        try {
+            $Material = Price::whereIn('member_id', $req->id);
+            if ($Material->count() > 0) {
+                return response()->json(['msg' => 'Level Member Masih Terikat di Harga Aktif,Tidak Bisa di Hapus']);
+            } else {
+                LevelMember::whereIn('id', $req->id)->delete();
+                DB::commit();
+                return response()->json(['success' => true, 'msg' => 'Berhasil Delete']);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'msg' => $e->getMessage()]);
+        }
+    }
+
 
 
     public function jsonForListUnit(Request $request)

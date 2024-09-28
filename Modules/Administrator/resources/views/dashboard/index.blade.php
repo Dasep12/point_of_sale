@@ -101,7 +101,6 @@
                     <div class="p-2 bd-highlight" style="width: 25% !important;">
                         <select id="item_id" style="font-size: 0.75rem !important;" class="form-control form-control-sm custom-select select2">
                             <option value="">*Choose Item</option>
-                            <!-- Add more options as needed -->
                         </select>
                     </div>
                     <div class="p-2 bd-highlight">
