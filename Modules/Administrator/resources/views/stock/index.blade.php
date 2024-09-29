@@ -147,12 +147,12 @@
                 }
             },
             viewrecords: true,
-            width: '100%',
-            rownumbers: true,
-            rownumWidth: 30,
-            rowNum: 15,
-            height: 'auto',
-            shrinkToFit: false,
+            width: 780,
+            height: 350,
+            rowNum: 20,
+            autowidth: true,
+            loadonce: false,
+            rowNum: 20,
             autowidth: true,
             pager: "#pager",
             loadComplete: function() {

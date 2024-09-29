@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Administrator\App\Models\LevelMember;
 use Modules\Administrator\App\Models\Adjust;
 use Modules\Administrator\App\Models\Material;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AdjustController extends Controller
 {
@@ -190,6 +191,67 @@ class AdjustController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['msg' => $e->getMessage()]);
+        }
+    }
+
+    public function uploadFilesAdjust(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'files_upload' => 'required|mimes:xlsx,xls,csv',
+            ]);
+
+            $file = $request->file('files_upload');
+            $filePath = $file->getPathname();
+
+            // Start processing the file
+            $spreadsheet = IOFactory::load($filePath);
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+            unset($sheetData[0]);
+            unset($sheetData[1]);
+            $processedData = [];
+            $error = [];
+            foreach ($sheetData as  $row) {
+                $material = Material::where('kode_item', $row['C'])->count();
+                if ($material <= 0) {
+                    array_push($error, ['Kode Item ' . $row['C'] . ' not found']);
+                }
+
+                $material = Material::where('name_item', $row['B'])->count();
+                if ($material <= 0) {
+                    array_push($error, ['Name Item ' . $row['B'] . ' not found']);
+                }
+
+                $details = DB::table('tbl_mst_material as a')
+                    ->leftJoin('tbl_mst_units as b', 'b.id', '=', 'a.unit_id')
+                    ->where('a.kode_item', $row['C'])
+                    ->select('a.unit_id', 'b.unit_code', 'a.merek')
+                    ->get()
+                    ->first();
+
+
+                $res = [
+                    'item_name'       => $row['B'],
+                    'kode_item'       => $row['C'],
+                    'qty'             => $row['D'],
+                    'satuan_id'       => $details->unit_id,
+                    'satuan'          => $details->unit_code,
+                    'merek'           => $details->merek,
+                ];
+                array_push($processedData, $res);
+            }
+            return response()->json([
+                'message' => 'File processed successfully.',
+                'data'    => $processedData,
+                'errors'  => $error,
+                'success' => count($error) > 0 ? false : true
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'data' => []
+            ], 500);
         }
     }
 

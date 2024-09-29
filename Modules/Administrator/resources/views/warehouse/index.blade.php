@@ -136,33 +136,15 @@
                 width: 70,
                 formatter: actionBarangFormatter
             }],
-            jsonReader: {
-                repeatitems: false,
-                root: function(obj) {
-                    return obj.rows;
-                },
-                page: function(obj) {
-                    return obj.page;
-                },
-                total: function(obj) {
-                    return obj.total;
-                },
-                records: function(obj) {
-                    return obj.records;
-                }
-            },
-            loadonce: false,
             viewrecords: true,
-            rownumbers: true,
-            rownumWidth: 30,
-            autoresizeOnLoad: true,
-            gridview: true,
             width: 780,
             height: 350,
-            multiselect: true,
             rowNum: 20,
+            autowidth: true,
+            loadonce: false,
+            rowNum: 20,
+            multiselect: true,
             rowList: [20, 50, 100],
-            shrinkToFit: false,
             pager: "#pager",
             loadComplete: function(data) {
                 $("#jqGridMain").parent().find(".no-data").remove(); // Remove the message if there is data

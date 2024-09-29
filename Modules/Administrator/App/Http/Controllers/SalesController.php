@@ -60,7 +60,7 @@ class SalesController extends Controller
             $cekStock = DB::table('vw_stock_item')->where('barcode', $req->barcode)->get()->first();
 
             if ($cekStock->Stock < (float)$req->qty) {
-                $resp = ["msg" => "nok", "data" => "Pembelian Melebihi Stock Yang Ada, Silahkan Adjust Stock Product Dahulu"];
+                $resp = ["msg" => "nok", "data" => "Silahkan Adjust Stock Product Dahulu," . " Sisa Stock Sekarang " . $cekStock->Stock];
                 return response()->json($resp);
             }
 

@@ -157,6 +157,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     Route::post('jsonSaveTransaksiAdjust', 'AdjustController@jsonSaveTransaksiAdjust');
     Route::get('jsonDeleteAdjust', 'AdjustController@jsonDeleteAdjust');
     Route::get('jsonDetailAdjust', 'AdjustController@jsonDetailAdjust');
+    Route::post('uploadFilesAdjust', 'AdjustController@uploadFilesAdjust');
     Route::get('getJsonBarangAdjust', 'AdjustController@getJsonBarangAdjust');
 
     // PEMBELIAN ROUTES 

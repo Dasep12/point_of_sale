@@ -40,6 +40,8 @@
                 <div class="form-group">
                     @if(CrudMenuPermission($MenuUrl, $user_id, "add"))
                     <button type="button" name="tloEnable" id="openModalBtn" onclick="CrudAdjust('create', '*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-plus"></i> Create</button>
+
+                    <button type="button" name="tloEnable" id="openModalBtn" onclick="CrudAdjust('upload', '*')" class="btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel-o"></i> Upload</button>
                     @endif
                     <button type="button" name="tloEnable" onclick="ReloadBarang()" class="btn btn-sm btn-outline-secondary"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
@@ -81,9 +83,11 @@
     });
     // Prepare Data Sales
     var dataSales = [];
+    var dataTemp = [];
 </script>
 
 @include('administrator::adjust.partials.CrudAdjust')
+
 <script>
     $("#jqGridMain").jqGrid({
         url: "{{ url('administrator/jsonAdjust') }}",
@@ -248,6 +252,8 @@
     });
 
 
+
+
     // Function to open fullscreen mode
     function openFullscreen() {
         // if (elem.requestFullscreen) {
@@ -318,6 +324,13 @@
         return btn;
     }
 
+    function actionListUpload(values, options, rowObject) {
+        var btnid = rowObject.id;
+        var btn = '';
+        btn += `<button type="button" data-id="${btnid}" onclick="CrudListItemUpload('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger btnActionMaterial"><i class="fa fa-remove"></i></button>`;
+        return btn;
+    }
+
 
     function reloadgridItem(data) {
         // Clear existing data
@@ -328,6 +341,17 @@
         });
         // Refresh the grid
         $("#jqGridSalesList").trigger('reloadGrid');
+    }
+
+    function reloadgridItemAdjustUpload(data) {
+        // Clear existing data
+        // Clear existing data
+        $("#JqGridTempUpload").jqGrid('clearGridData', true);
+        $("#JqGridTempUpload").jqGrid('setGridParam', {
+            data: data
+        });
+        // Refresh the grid
+        $("#JqGridTempUpload").trigger('reloadGrid');
     }
 
 
@@ -401,6 +425,8 @@
                     },
                 }
             });
+        } else if (act == "upload") {
+            $('#CrudAdjustUploadModalUpload').modal('show');
         }
     }
 
@@ -462,5 +488,5 @@
         return arr;
     }
 </script>
-
+@include('administrator::adjust.partials.CrudAdjustUpload')
 @endsection
