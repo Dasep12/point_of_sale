@@ -278,7 +278,7 @@
 
     $("#btnBayarTrans").click(function(e) {
         e.preventDefault();
-        if (dataSales.length <= 0 || $("#uang_bayar").val() == "" || $("#sub_total").val() == "") {
+        if (dataSales.length <= 0) {
             doSuccess('create', "data transaksi masih kosong", 'warning');
         } else {
             var data = {

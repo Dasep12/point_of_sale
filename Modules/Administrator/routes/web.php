@@ -153,6 +153,7 @@ Route::middleware(['check.session', 'check.menuAccess'])->prefix('administrator'
     // ADJUST ROUTES 
     Route::get('adjust', 'AdjustController@index');
     Route::get('jsonAdjust', 'AdjustController@jsonAdjust');
+    Route::get('jsonListDetailAdjust', 'AdjustController@jsonListDetailAdjust');
     Route::get('jsonNoTransaksiAdjust', 'AdjustController@jsonNoTransaksiAdjust');
     Route::post('jsonSaveTransaksiAdjust', 'AdjustController@jsonSaveTransaksiAdjust');
     Route::get('jsonDeleteAdjust', 'AdjustController@jsonDeleteAdjust');

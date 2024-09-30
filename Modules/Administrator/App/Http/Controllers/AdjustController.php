@@ -85,14 +85,19 @@ class AdjustController extends Controller
     public function jsonDetailAdjust(Request $req)
     {
         if ($req->type == "in") {
-            $detail_table =  "tbl_trn_detail_beli";
+            $detail_table =  "tbl_trn_detail_beli as a";
+            $data = DB::table($detail_table)
+                ->where('header_id', $req->id)
+                ->select('a.*', 'a.in_stock as qty')
+                ->get();
         } else {
-            $detail_table =  "tbl_trn_detail_sales";
+            $detail_table =  "tbl_trn_detail_sales as a";
+            $data = DB::table($detail_table)
+                ->where('header_id', $req->id)
+                ->select('a.*', 'a.out_stock as qty')
+                ->get();
         }
-        $data = DB::table($detail_table)
-            ->where('header_id', $req->id)
-            ->select('*')
-            ->get();
+
         return response()->json($data);
     }
 
@@ -223,21 +228,33 @@ class AdjustController extends Controller
                     array_push($error, ['Name Item ' . $row['B'] . ' not found']);
                 }
 
-                $details = DB::table('tbl_mst_material as a')
-                    ->leftJoin('tbl_mst_units as b', 'b.id', '=', 'a.unit_id')
-                    ->where('a.kode_item', $row['C'])
-                    ->select('a.unit_id', 'b.unit_code', 'a.merek')
-                    ->get()
-                    ->first();
+                $idx = "";
+                $satuan_id = "";
+                $satuan = "";
+                $merek = "";
+                if ($material > 0) {
+                    $details = DB::table('tbl_mst_material as a')
+                        ->leftJoin('tbl_mst_units as b', 'b.id', '=', 'a.unit_id')
+                        ->where('a.kode_item', $row['C'])
+                        ->select('a.id', 'a.unit_id', 'b.unit_code', 'a.merek')
+                        ->get()
+                        ->first();
+                    $idx = $details->id;
+                    $satuan_id = $details->unit_id;
+                    $satuan = $details->unit_code;
+                    $merek = $details->merek;
+                }
+
 
 
                 $res = [
+                    'id'              => $idx,
                     'item_name'       => $row['B'],
                     'kode_item'       => $row['C'],
                     'qty'             => $row['D'],
-                    'satuan_id'       => $details->unit_id,
-                    'satuan'          => $details->unit_code,
-                    'merek'           => $details->merek,
+                    'satuan_id'       => $satuan_id,
+                    'satuan'          => $satuan,
+                    'merek'           => $merek,
                 ];
                 array_push($processedData, $res);
             }

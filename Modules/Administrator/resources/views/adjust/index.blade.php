@@ -126,6 +126,21 @@
             width: 60,
             hidden: true
         }, {
+            label: 'User Id',
+            name: 'created_by',
+            align: 'center',
+            width: 60,
+        }, {
+            label: 'Type Adjust',
+            name: 'idx',
+            align: 'center',
+            width: 60,
+            hidden: false,
+            formatter: function(val, row, opt) {
+                var res = opt.type == "in" ? 'Plus (+)' : "Minus (-)";
+                return `${ res }`
+            }
+        }, {
             label: 'Action',
             name: 'id',
             width: 80,
@@ -173,14 +188,18 @@
 
     function loadDetailMaterial(subgrid_id, row_id) {
         // Function to load subgrid data
+        var Grid = $('#jqGridMain'),
+            type = Grid.jqGrid('getCell', row_id, 'type');
+
         var subgrid_table_id = subgrid_id + "_t";
         $("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table>");
         $("#" + subgrid_table_id).jqGrid({
-            url: "{{ url('administrator/jsonListDetailBeli') }}",
+            url: "{{ url('administrator/jsonListDetailAdjust') }}",
             mtype: "GET",
             datatype: "json",
             postData: {
                 id: row_id,
+                adjust_type: type,
                 "_token": "{{ csrf_token() }}",
             },
             page: 1,
@@ -200,7 +219,7 @@
                 width: 60
             }, {
                 label: 'Qty',
-                name: 'in_stock',
+                name: 'qty',
                 align: 'center',
                 width: 60
             }],
@@ -327,7 +346,7 @@
     function actionListUpload(values, options, rowObject) {
         var btnid = rowObject.id;
         var btn = '';
-        btn += `<button type="button" data-id="${btnid}" onclick="CrudListItemUpload('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger btnActionMaterial"><i class="fa fa-remove"></i></button>`;
+        btn += `<button type="button" data-id="${btnid}" onclick="CrudListItem('delete','${btnid}')" class="btn btn-sm text-white btn-option badge-danger btnActionMaterial"><i class="fa fa-remove"></i></button>`;
         return btn;
     }
 
@@ -427,13 +446,16 @@
             });
         } else if (act == "upload") {
             $('#CrudAdjustUploadModalUpload').modal('show');
+            noTransaksiUpload()
         }
     }
 
     function CrudListItem(act, id) {
         if (act == "delete") {
             dataSales = dataSales.filter(item => item.id != id);
+            dataTemp = dataTemp.filter(item => item.id != id);
             reloadgridItem(dataSales);
+            reloadgridItemAdjustUpload(dataTemp);
         }
     }
 
@@ -455,23 +477,27 @@
             },
             success: function(res) {
                 dataSales = [];
-                var params = res[0];
-                var data = {
-                    id: params.item_id,
-                    item_id: params.item_id,
-                    item_name: params.item_name,
-                    satuan_id: params.unit_id,
-                    satuan: params.unit_name,
-                    kode_item: params.kode_item,
-                    merek: params.merek,
-                    qty: params.in_stock,
-                    hpp: 0,
-                    total: 0
-                }
-                if (materialExists(params.item_id)) {
-                    doSuccess('create', 'item sudah masuk list', 'error')
-                } else {
-                    dataSales.push(data);
+
+
+                for (let i = 0; i < res.length; i++) {
+                    var params = res[i];
+                    var data = {
+                        id: params.item_id,
+                        item_id: params.item_id,
+                        item_name: params.item_name,
+                        satuan_id: params.unit_id,
+                        satuan: params.unit_name,
+                        kode_item: params.kode_item,
+                        merek: params.merek,
+                        qty: params.qty,
+                        hpp: 0,
+                        total: 0
+                    }
+                    if (materialExists(params.item_id)) {
+                        doSuccess('create', 'item sudah masuk list', 'error')
+                    } else {
+                        dataSales.push(data);
+                    }
                 }
                 reloadgridItem(dataSales);
             }
@@ -481,12 +507,28 @@
 
 
     function removeMaterialWithId(arr, id) {
-        const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
+        const objWithIdIndex = arr.findIndex((obj) => obj.id == id);
         if (objWithIdIndex > -1) {
             arr.splice(objWithIdIndex, 1);
         }
         return arr;
     }
+
+    function noTransaksiUpload() {
+        $.ajax({
+            url: '{{ url("administrator/jsonNoTransaksiAdjust") }}',
+            method: "GET",
+            type: 'GET',
+            data: {
+
+            },
+            success: function(data) {
+                var resp = data;
+                $("#noTransaksiUpload").val(data)
+            }
+        })
+    }
+    noTransaksiUpload()
 </script>
 @include('administrator::adjust.partials.CrudAdjustUpload')
 @endsection

@@ -26,124 +26,73 @@ class Adjust extends Model
     ];
     public static function jsonList($req)
     {
-        $page = $req->input('page');
-        $limit = $req->input('rows');
-        $sidx = $req->input('sidx', 'id');
-        $sord = $req->input('sord', 'asc');
-        $start = ($page - 1) * $limit;
 
-        // Total count of records
-        $qry = "SELECT COUNT(1) AS count from tbl_trn_header_trans 
-        left join (
-           select count(1) total , header_id from tbl_trn_detail_beli
-           group by header_id
-        ) X on X.header_id = id
-        where types in ('adjust') 
-        ";
-        if ($req->search) {
-            $qry .= " AND no_transaksi LIKE '%$req->search%' ";
-        }
-        $countResult = DB::select($qry);
-        $count = $countResult[0]->count;
 
-        // Total pages calculation
-        if ($count > 0) {
-            $total_pages = ceil($count / $limit);
-        } else {
-            $total_pages = 0;
-        }
+        $page = $req->input('page'); // current page number
+        $limit = $req->input('rows'); // rows per page
+        $sidx = $req->input('sidx'); // sort column
+        $sord = $req->input('sord'); // sort direction
 
-        // Fetch data using DB::raw
-        $query = "SELECT * , X.total_item from tbl_trn_header_trans left join (
-           select count(1) total_item , header_id from tbl_trn_detail_beli
-           group by header_id
-        ) X on X.header_id = id
-        where types in ('adjust') ";
-        if ($req->search) {
-            $query .= " AND no_transaksi LIKE '%$req->search%' ";
-        }
-        $query .= " ORDER BY  id  DESC  LIMIT  $start , $limit ";
-        $data = DB::select($query);
+        $query = DB::table('tbl_trn_header_trans as a')
+            ->select('a.id', 'a.type', 'a.date_trans', 'a.no_transaksi', 'a.status_bayar', 'a.created_by', DB::raw('COUNT(b.id) as total_item'))
+            ->leftJoin('tbl_trn_detail_sales as b', 'b.header_id', '=', 'a.id')
+            ->groupBy('a.id', 'a.type', 'a.date_trans', 'a.no_transaksi', 'a.status_bayar', 'a.created_by')
+            ->orderByDesc('a.id');
 
-        // Prepare rows for jqGrid
-        $rows = [];
-        foreach ($data as $item) {
-            $rows[] = [
-                'id'                => $item->id,
-                'type'              => $item->type,
-                'date_trans'        => $item->date_trans,
-                'no_transaksi'      => $item->no_transaksi,
-                'total_item'        => $item->total_item,
-                'status_bayar'      => $item->status_bayar,
-                'total_bayar'       => $item->total_bayar,
-                'created_at'        => $item->created_at,
-                'created_by'        => $item->created_by,
-                'updated_at'        => $item->updated_at,
-                'updated_by'        => $item->updated_by,
-                'cell' => [
-                    $item->id,
-                ] // Adjust fields as needed
-            ];
-        }
+        $count = $query->count();
+
+        $data = $query->skip(($page - 1) * $limit)
+            ->take($limit)
+            ->get();
+
+        $totalPages = ($count > 0) ? ceil($count / $limit) : 0;
 
         $response = [
             'page' => $page,
-            'total' => $total_pages,
+            'total' => $totalPages,
             'records' => $count,
-            'rows' => $rows
+            'rows' => $data->toArray(),
         ];
+
         return $response;
     }
 
-    public static function jsonListDetailBeli($req)
+    public static function jsonListDetailAdjust($req)
     {
-        $page = $req->input('page');
-        $limit = $req->input('rows');
-        $sidx = $req->input('sidx', 'id');
-        $sord = $req->input('sord', 'asc');
-        $start = ($page - 1) * $limit;
 
-        // Total count of records
-        $qry = "SELECT COUNT(1) AS count FROM tbl_trn_detail_beli  WHERE header_id = '$req->id' ";
+        $page = $req->input('page'); // current page number
+        $limit = $req->input('rows'); // rows per page
+        $sidx = $req->input('sidx'); // sort column
+        $sord = $req->input('sord'); // sort direction
 
-        $countResult = DB::select($qry);
-        $count = $countResult[0]->count;
-
-        // Total pages calculation
-        if ($count > 0) {
-            $total_pages = ceil($count / $limit);
+        if ($req->adjust_type == "in") {
+            $query = DB::table('tbl_trn_detail_beli as a')
+                ->where('header_id', $req->id)
+                ->select('a.item_name', 'a.unit_name', 'a.in_stock as qty');
         } else {
-            $total_pages = 0;
+            $query = DB::table('tbl_trn_detail_sales as a')
+                ->where('header_id', $req->id)
+                ->select('a.item_name', 'a.unit_name', 'a.out_stock as qty');
         }
 
-        // Fetch data using DB::raw
-        $query = "SELECT * FROM tbl_trn_detail_beli  WHERE header_id = '$req->id' ";
 
-        $query .= " ORDER BY  id  DESC  LIMIT  $start , $limit ";
-        $data = DB::select($query);
 
-        // Prepare rows for jqGrid
-        $rows = [];
-        foreach ($data as $item) {
-            $rows[] = [
-                'id'              => $item->id,
-                'item_name'       => $item->item_name,
-                'unit_name'       => $item->unit_name,
-                'in_stock'        => $item->in_stock,
-                'hpp'             => $item->hpp,
-                'total'           => $item->in_stock * $item->hpp,
-                'cell' => [
-                    $item->id,
-                ] // Adjust fields as needed
-            ];
-        }
+
+        $count = $query->count();
+
+        $data = $query->skip(($page - 1) * $limit)
+            ->take($limit)
+            ->get();
+
+        $totalPages = ($count > 0) ? ceil($count / $limit) : 0;
 
         $response = [
             'page' => $page,
-            'total' => $total_pages,
+            'total' => $totalPages,
             'records' => $count,
-            'rows' => $rows
+            'rows' => $data->toArray(),
         ];
+
         return $response;
     }
 }

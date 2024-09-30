@@ -25,6 +25,11 @@
               @csrf
               <div class="row">
                 <div class="col-lg-4">
+                  <label class="" for="noTransaksi">No Transaksi <span class="required">*</span>
+                  </label>
+                  <input readonly type="text" id="noTransaksiUpload" name="noTransaksiUpload" required="required" class="form-control form-control-sm">
+                </div>
+                <div class="col-lg-4">
                   <div class="form-group form-group-sm">
                     <label for="">Type Adjust</label>
                     <select name="type_adjust_upload" class="form-control custom-select" id="type_adjust_upload">
@@ -62,7 +67,7 @@
             <div class="col md-12">
               <table id="JqGridTempUpload"></table>
               <div id="jqGridPager2"></div>
-              <a href="" class="mt-2 btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel"></i> Download Template</a>
+              <a href="{{ asset('document/format_upload_adjust.xlsx')  }}" class="mt-2 btn btn-sm btn-outline-secondary"><i class="fa fa-file-excel"></i> Download Template</a>
             </div>
           </div>
           <div class="row mt-1" id="ErrorInfoUpload"></div>
@@ -70,7 +75,7 @@
       </div>
 
       <div class="modal-footer">
-        <button id="btnUploadTrans" type="button" class="btn btn-sm btn-primary btn-upload-file"><i class="fa fa-save"></i> Submit</button>
+        <button id="btnUploadTrans" type="submit" class="btn btn-sm btn-primary btn-upload-file"><i class="fa fa-save"></i> Submit</button>
         <button id="btnUploadCancel" data-dismiss="modal" type="button" class="btn btn-sm btn-danger"><i class="fa fa-close"></i> Batal</button>
       </div>
       </form>
@@ -194,8 +199,8 @@
           var resp = response.data;
           for (let r = 0; r < resp.length; r++) {
             var datas = {
-              id: resp[r].kode_item,
-              item_id: resp[r].kode_item,
+              id: resp[r].id,
+              item_id: resp[r].id,
               item_name: resp[r].item_name,
               satuan_id: resp[r].satuan_id,
               satuan: resp[r].satuan,
@@ -248,23 +253,40 @@
   $("#CrudAdjustUploadForm2").parsley();
 
   $("#CrudAdjustUploadForm2").submit(function(e) {
+    e.preventDefault();
+    var data = {
+      '_token': "{{ csrf_token() }}",
+      'listBelanja': JSON.stringify(dataTemp),
+      '_total_bayar': $("#total_bayar").val(),
+      '_noTransaksi': $("#noTransaksiUpload").val(),
+      '_dateTransaksi': "<?= date('Y-m-d') ?>",
+      '_type_adjust': $("#type_adjust_upload").val(),
+    }
+
+    // console.log(JSON.stringify(dataTemp));
     var allData = $("#JqGridTempUpload").jqGrid('getRowData');
     $.ajax({
-      url: "{{ url('jsonImportStock') }}",
-      method: 'POST',
-      cache: false,
-      data: {
-        "_token": "{{ csrf_token() }}",
-        supplier_id: $("#suppliers_id").val(),
-        allData: allData,
-      },
-      success: function(response) {
-        if (response.success) {
-          reloadGridList()
-          reloadgridItem(dataTemp)
-          $("#CrudAdjustUploadModalUpload").modal('hide');
-          doSuccess('stock', $("#CrudActionStockUpload").val())
+      url: '{{ url("administrator/jsonSaveTransaksiAdjust") }}',
+      method: "POST",
+      type: 'POST',
+      data: data,
+      success: function(data) {
+        console.log(data.success);
+
+        if (data.success) {
+          if ($("#CrudActionAdjustUpload").val() == "create") {
+            noTransaksiUpload();
+          }
+          ReloadBarang();
+          doSuccess('create', 'Data Save To Record', 'success');
+          dataTemp = [];
+          reloadgridItemAdjustUpload(dataTemp);
+          $('.progress').hide();
+          $('#CrudAdjustUploadModalUpload').modal('hide');
+        } else {
+          doSuccess('create', 'Data Masih Kosong', 'error')
         }
+
       },
       error: function(xhr, desc, err) {
         var respText = "";
@@ -275,7 +297,8 @@
         }
 
         respText = unescape(respText).replaceAll("_n_", "<br/>")
-        var errMsg = '<div class="col-md-12"><div class="alert alert-custom-warning alert-warning alert-dismissible fade show" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button></div></div>'
+
+        var errMsg = '<div class="alert alert-warning mt-2" role="alert"><small><b> Error ' + xhr.status + '!</b><br/>' + respText + '</small></div>'
         $('#ErrorInfoUpload').html(errMsg);
       },
     });
